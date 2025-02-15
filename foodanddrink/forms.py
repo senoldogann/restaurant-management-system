@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from .models import UserProfile, Review
 from restaurant.models import MenuItem
 from bar.models import Drink
+from django.contrib.auth.forms import AuthenticationForm
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -61,3 +62,20 @@ class ReviewForm(forms.Form):
             raise forms.ValidationError('Lütfen sadece bir menü öğesi veya içecek seçin.')
         
         return cleaned_data 
+
+class CustomAuthenticationForm(AuthenticationForm):
+    remember_me = forms.BooleanField(required=False, initial=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Kullanıcı adınızı girin'
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Şifrenizi girin'
+        })
+        self.fields['remember_me'].widget.attrs.update({
+            'class': 'form-check-input'
+        }) 

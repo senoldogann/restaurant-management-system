@@ -19,18 +19,23 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
-from django.contrib.auth import views as auth_views
+from .views import home, register, profile, CustomLoginView, contact
+from django.contrib.auth.views import LogoutView
+from .forms import CustomAuthenticationForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
-    path('register/', views.register, name='register'),
-    path('login/', views.CustomLoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
-    path('profile/', views.profile, name='profile'),
+    path('', home, name='home'),
+    path('register/', register, name='register'),
+    path('login/', CustomLoginView.as_view(
+        template_name='registration/login.html',
+        authentication_form=CustomAuthenticationForm
+    ), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('profile/', profile, name='profile'),
     path('restaurant/', include('restaurant.urls')),
     path('bar/', include('bar.urls')),
-    path('contact/', views.contact, name='contact'),
+    path('contact/', contact, name='contact'),
     path('review/<int:item_id>/', views.add_review, name='add_review'),
     path('review/', views.add_review, name='add_review'),
     path('review/<int:review_id>/response/', views.add_response, name='add_response'),

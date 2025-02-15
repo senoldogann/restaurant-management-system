@@ -177,3 +177,11 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 SITE_NAME = os.getenv('SITE_NAME', 'Food & Drink')
+
+# Oturum Ayarları
+SESSION_COOKIE_AGE = 60 * 60 * 2  # 2 saat
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Tarayıcı kapandığında oturumu sonlandırma
+
+# Oturum zaman aşımı ayarları
+SESSION_SAVE_EVERY_REQUEST = True  # Her istekte session'ı güncelle
+SESSION_IDLE_TIMEOUT = SESSION_COOKIE_AGE  # 2 saat boyunca işlem yapılmazsa session'ı sonlandır

@@ -271,6 +271,44 @@
                 opacity: 1;
             }
         }
+
+        .card-body {
+            max-height: 600px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) #f1f1f1;
+        }
+
+        /* Webkit tabanlı tarayıcılar için scrollbar stilleri */
+        .card-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .card-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .card-body::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .card-body::-webkit-scrollbar-thumb:hover {
+            background: #E67E22;
+        }
+
+        /* Scroll animasyonu */
+        .card-body {
+            scroll-behavior: smooth;
+        }
+
+        /* Mobil cihazlar için scroll yüksekliği */
+        @media (max-width: 768px) {
+            .card-body {
+                max-height: 400px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -362,6 +400,15 @@
                                                         <span class="ms-2">(düzenlendi: {{ response.updated_at|date:"d.m.Y H:i" }})</span>
                                                     {% endif %}
                                                 </div>
+                                                {% if response.review.location == 'restaurant' and response.review.menu_item and response.review.menu_item.slug %}
+                                                    <a href="{% url 'restaurant:menu_item_detail' slug=response.review.menu_item.slug %}#review-{{ response.review.id }}" class="btn btn-sm btn-outline-primary mt-2">
+                                                        <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
+                                                    </a>
+                                                {% elif response.review.location == 'bar' and response.review.drink and response.review.drink.slug %}
+                                                    <a href="{% url 'bar:drink_detail' slug=response.review.drink.slug %}#review-{{ response.review.id }}" class="btn btn-sm btn-outline-primary mt-2">
+                                                        <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
+                                                    </a>
+                                                {% endif %}
                                             </div>
                                             <div class="response-actions">
                                                 <button class="btn btn-sm btn-link text-primary edit-response-btn"
@@ -418,6 +465,15 @@
                                                 </div>
                                                 <p class="mb-1">{{ review.comment }}</p>
                                                 <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                                                {% if review.location == 'restaurant' and review.menu_item and review.menu_item.slug %}
+                                                    <a href="{% url 'restaurant:menu_item_detail' slug=review.menu_item.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2 d-block">
+                                                        <i class="fas fa-external-link-alt me-1"></i>Değerlendirmeye Git
+                                                    </a>
+                                                {% elif review.location == 'bar' and review.drink and review.drink.slug %}
+                                                    <a href="{% url 'bar:drink_detail' slug=review.drink.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2 d-block">
+                                                        <i class="fas fa-external-link-alt me-1"></i>Değerlendirmeye Git
+                                                    </a>
+                                                {% endif %}
                                             </div>
                                             <div class="review-actions">
                                                 <button class="btn btn-sm btn-link text-primary edit-review-btn"
@@ -445,6 +501,15 @@
                                                 </div>
                                                 <div class="response-content">
                                                     <p>{{ response.response_text }}</p>
+                                                    {% if review.location == 'restaurant' and review.menu_item and review.menu_item.slug %}
+                                                        <a href="{% url 'restaurant:menu_item_detail' slug=review.menu_item.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2">
+                                                            <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
+                                                        </a>
+                                                    {% elif review.location == 'bar' and review.drink and review.drink.slug %}
+                                                        <a href="{% url 'bar:drink_detail' slug=review.drink.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2">
+                                                            <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
+                                                        </a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             {% endfor %}

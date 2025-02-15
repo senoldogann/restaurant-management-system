@@ -366,18 +366,17 @@ def edit_review(request, review_id):
 
 class CustomLoginView(LoginView):
     def form_valid(self, form):
-        remember_me = self.request.POST.get('remember_me')
+        remember_me = form.cleaned_data.get('remember_me')
         if not remember_me:
+            # Oturum tarayıcı kapandığında sonlanacak
             self.request.session.set_expiry(0)
             self.request.session.modified = True
-            
-        response = super().form_valid(form)
-        if self.request.session.pop('registration_success', False):
-            messages.success(self.request, 'Hesabınız başarıyla oluşturuldu! Hoş geldiniz.')
-        else:
-            messages.success(self.request, f'Hoş geldiniz, {self.request.user.get_full_name() or self.request.user.username}!')
+        # Kullanıcı "Beni Hatırla"yı seçtiyse, settings.py'deki SESSION_COOKIE_AGE kullanılacak
+        
+        # Giriş başarılı mesajı için session değişkeni
         self.request.session['just_logged_in'] = True
-        return response
+        
+        return super().form_valid(form)
 
 def get_restaurant_info():
     return RestaurantInfo.objects.first()
