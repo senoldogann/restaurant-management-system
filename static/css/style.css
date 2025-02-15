@@ -1005,3 +1005,143 @@ body {
     font-style: italic;
     color: #6c757d;
 }
+
+/* Profile Page Styles */
+.profile-page {
+    padding: 2rem 0;
+    min-height: 100vh;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-color), #E67E22);
+    padding: 2rem;
+    text-align: center;
+    color: white;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    position: relative;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.default-avatar {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.profile-email {
+    opacity: 0.9;
+    margin: 0;
+}
+
+.profile-body {
+    padding: 2rem;
+}
+
+.profile-form .form-control {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.reviews-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+}
+
+.reviews-title {
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.review-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.review-info h5 {
+    margin: 0;
+    color: var(--secondary-color);
+}
+
+.review-rating {
+    color: #ffc107;
+}
+
+.review-comment {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.review-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.no-reviews i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-reviews p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .profile-card {
+        margin-bottom: 2rem;
+    }
+
+    .navigation-buttons {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
