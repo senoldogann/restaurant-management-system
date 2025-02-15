@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="choice-section">
+    <div class="choice-container">
+        <div class="row g-0">
+            <!-- Restaurant Seçeneği -->
+            <div class="col-md-6 choice-item restaurant-choice">
+                <div class="choice-content" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% if home_settings.restaurant_background %}{{ home_settings.restaurant_background.url }}{% else %}{% static "images/restaurant-bg.jpg" %}{% endif %}'); background-size: cover; background-position: center; min-height: 100vh; display: flex; align-items: center;">
+                    <div class="choice-overlay"></div>
+                    <div class="choice-text">
+                        <h2 class="choice-title">Restaurant</h2>
+                        <p class="choice-description">Eşsiz lezzetler ve özel menüler ile unutulmaz bir yemek deneyimi yaşayın.</p>
+                        <div class="choice-features">
+                            <div class="feature">
+                                <i class="fas fa-utensils"></i>
+                                <span>Özel Menü</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-star"></i>
+                                <span>Kaliteli Hizmet</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-award"></i>
+                                <span>Ödüllü Şefler</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'restaurant:home' %}" class="btn btn-outline-light btn-lg choice-btn">
+                            <i class="fas fa-utensils me-2"></i>Restaurant'a Git
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bar Seçeneği -->
+            <div class="col-md-6 choice-item bar-choice">
+                <div class="choice-content" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% if home_settings.bar_background %}{{ home_settings.bar_background.url }}{% else %}{% static "images/bar-bg.jpg" %}{% endif %}'); background-size: cover; background-position: center; min-height: 100vh; display: flex; align-items: center;">
+                    <div class="choice-overlay"></div>
+                    <div class="choice-text">
+                        <h2 class="choice-title">Bar</h2>
+                        <p class="choice-description">Özel kokteyller, canlı müzik ve unutulmaz etkinliklerle dolu eğlenceli anlar.</p>
+                        <div class="choice-features">
+                            <div class="feature">
+                                <i class="fas fa-cocktail"></i>
+                                <span>Özel Kokteyller</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-music"></i>
+                                <span>Canlı Müzik</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Özel Etkinlikler</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'bar:home' %}" class="btn btn-outline-light btn-lg choice-btn">
+                            <i class="fas fa-glass-martini-alt me-2"></i>Bar'a Git
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

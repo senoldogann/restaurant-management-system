@@ -1,0 +1,1027 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Food & Drink{% endblock %}</title>
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #f39600;
+            --primary-color-rgb: 255, 215, 0;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --font-family: 'Poppins', sans-serif;
+            --transition: all 0.3s ease;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Fancybox özel stilleri */
+        .fancybox__container {
+            --fancybox-bg: rgba(0, 0, 0, 0.9);
+        }
+
+        .fancybox__content {
+            max-width: 90vw;
+            max-height: 90vh;
+            padding: 0;
+        }
+
+        .fancybox__image {
+            max-height: 85vh;
+            object-fit: contain;
+        }
+
+        .fancybox__caption {
+            font-family: var(--font-family);
+            font-size: 1.1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+
+        .fancybox__toolbar {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .fancybox__slide {
+            padding: 2rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-family);
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        p {
+            font-family: var(--font-family);
+            font-weight: 400;
+        }
+
+        .btn {
+            font-family: var(--font-family);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .form-control {
+            font-family: var(--font-family);
+        }
+
+        .navbar {
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background-color: transparent;
+            height: auto;
+            min-height: 60px;
+        }
+        
+        .navbar.scrolled {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0.5rem 0;
+            height: auto;
+            min-height: 60px;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+            line-height: 1;
+            color: white !important;
+        }
+        
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            flex-direction: row !important;
+        }
+        
+        .navbar > .container {
+            min-height: 60px;
+            height: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-collapse {
+            display: flex;
+            align-items: center;
+            flex-basis: auto;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+            margin: 0 0.5rem;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .nav-link {
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+            background-color: transparent !important;
+            border: 0 !important;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        
+        .dropdown-menu {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            min-width: 200px;
+            animation: fadeIn 0.3s ease;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            z-index: 1500;
+        }
+        
+        .dropdown-menu.show {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .dropdown:hover .dropdown-menu {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .dropdown-item {
+            padding: 0.7rem 1.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: white !important;
+            background-color: transparent !important;
+        }
+        
+        .dropdown-item:hover {
+            background-color: transparent !important;
+            color: var(--primary-color) !important;
+            transform: translateX(5px);
+        }
+
+        .nav-item.dropdown:hover .nav-link,
+        .nav-item.dropdown .nav-link:focus {
+            background-color: transparent !important;
+            color: var(--primary-color) !important;
+        }
+
+        .nav-item.dropdown .dropdown-toggle:active,
+        .nav-item.dropdown.show .dropdown-toggle {
+            background-color: transparent !important;
+            color: var(--primary-color) !important;
+        }
+
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-item.dropdown .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+        }
+        
+        .dropdown-item i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 0;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+        
+        .navbar-toggler-icon {
+            width: 24px;
+            height: 24px;
+            background-image: none;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler-icon::before,
+        .navbar-toggler-icon::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 2px;
+            background-color: white;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler-icon::before {
+            top: 0;
+        }
+        
+        .navbar-toggler-icon::after {
+            bottom: 0;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::before {
+            transform: rotate(45deg);
+            top: 50%;
+        }
+        
+        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::after {
+            transform: rotate(-45deg);
+            bottom: 50%;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 4rem 0;
+        }
+
+        .footer h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer .list-unstyled li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer .list-unstyled a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer .list-unstyled a:hover {
+            color: var(--primary-color);
+            padding-left: 5px;
+        }
+
+        .footer .social-links a {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer .working-hours-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .footer .working-hours-row:last-child {
+            margin-bottom: 1rem;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .footer .working-hours-row .day {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .footer .working-hours-row .hours {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .contact-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, #f39600, #E67E22);
+            box-shadow: 0 0 20px rgba(243, 150, 0, 0.5);
+        }
+
+        .contact-info::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(243, 150, 0, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .contact-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 4rem;
+            text-align: center;
+            color: white;
+            font-weight: 700;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .contact-info h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #f39600;
+            border-radius: 2px;
+        }
+
+        .contact-info .info-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-info .info-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(243, 150, 0, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .contact-info .info-box:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(243, 150, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-info .info-box:hover::before {
+            opacity: 1;
+        }
+
+        .contact-info i {
+            color: #f39600;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            background: rgba(243, 150, 0, 0.1);
+            padding: 1rem;
+            border-radius: 15px;
+            transition: all 0.4s ease;
+        }
+
+        .contact-info .info-box:hover i {
+            transform: scale(1.1);
+            background: rgba(243, 150, 0, 0.2);
+        }
+
+        .contact-info h5 {
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .contact-info p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .social-links {
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .social-links::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: rgba(243, 150, 0, 0.3);
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.8rem;
+            margin: 0 1.2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            display: inline-block;
+        }
+
+        .social-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f39600;
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+            transform-origin: right;
+        }
+
+        .social-links a:hover {
+            color: #f39600;
+            transform: translateY(-3px);
+        }
+
+        .social-links a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        @media (max-width: 768px) {
+            .contact-info {
+                padding: 4rem 0;
+            }
+
+            .map-container {
+                height: 300px;
+                margin-top: 2rem;
+            }
+
+            .contact-info h2 {
+                font-size: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            .contact-info .info-box {
+                padding: 2rem;
+            }
+
+            .contact-info i {
+                font-size: 2rem;
+                padding: 0.8rem;
+            }
+
+            .contact-info h5 {
+                font-size: 1.2rem;
+            }
+
+            .contact-info p {
+                font-size: 1rem;
+            }
+
+            .social-links a {
+                font-size: 1.5rem;
+                margin: 0 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .contact-info h2 {
+                font-size: 1.8rem;
+            }
+
+            .contact-info .info-box {
+                padding: 1.5rem;
+            }
+
+            .social-links a {
+                font-size: 1.3rem;
+                margin: 0 0.8rem;
+            }
+        }
+
+        /* Header Search Form Styles */
+        .navbar .search-form {
+            max-width: 300px;
+            margin-left: auto;
+        }
+
+        .navbar .search-form .input-group {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .navbar .search-form .input-group:hover,
+        .navbar .search-form .input-group:focus-within {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .navbar .search-form .form-control {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            height: auto;
+        }
+
+        .navbar .search-form .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .navbar .search-form .form-control:focus {
+            box-shadow: none;
+        }
+
+        .navbar .search-form .btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .search-form .btn:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .navbar .search-form {
+                max-width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .navbar-expand-lg .navbar-nav {
+                flex-direction: row !important;
+            }
+        }
+
+        /* Mesaj container stilleri */
+        .message-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        .message-container .alert {
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .message-container .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .message-container .alert-warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .message-container .alert-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .message-container .alert-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .message-container .btn-close {
+            color: inherit;
+            opacity: 0.8;
+        }
+
+        .message-container .btn-close:hover {
+            opacity: 1;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% block auth_content %}
+    <!-- Navbar -->
+    {% if request.path != "/" and 'login' not in request.path and 'register' not in request.path %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-utensils me-2"></i>Food & Drink
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Anasayfa</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="background-color:transparent; border: 0px;">
+                            <i class="fas fa-utensils me-1"></i>Restoran
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/restaurant/menu/">
+                                <i class="fas fa-book-open me-2"></i>Menü
+                            </a></li>
+                            <li><a class="dropdown-item" href="/restaurant/reservation/">
+                                <i class="fas fa-calendar-alt me-2"></i>Rezervasyon
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="background-color:transparent; border: 0px;">
+                            <i class="fas fa-glass-martini-alt me-1"></i>Bar
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/bar/drinks/">
+                                <i class="fas fa-cocktail me-2"></i>İçecekler
+                            </a></li>
+                            <li><a class="dropdown-item" href="/bar/events/">
+                                <i class="fas fa-calendar-week me-2"></i>Etkinlikler
+                            </a></li>
+                            <li><a class="dropdown-item" href="/bar/reservation/">
+                                <i class="fas fa-calendar-alt me-2"></i>Rezervasyon
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}">Iletisim</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                {% if user.userprofile.profile_picture %}
+                                    <img src="{{ user.userprofile.profile_picture.url }}" alt="Profil" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user-circle me-2"></i>
+                                {% endif %}
+                                {{ user.get_full_name|default:user.username }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fas fa-user"></i> Profilim
+                                </a>
+                                {% if user.is_staff %}
+                                    <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                        <i class="fas fa-cog"></i> Yönetim Paneli
+                                    </a>
+                                {% endif %}
+                                <div class="dropdown-divider"></div>
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Giriş Yap
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">
+                                <i class="fas fa-user-plus me-1"></i> Kayıt Ol
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Mesajlar -->
+    {% if messages %}
+    <div class="message-container">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    {% if request.path != "/" and 'login' not in request.path and 'register' not in request.path %}
+    <footer class="footer py-5">
+        <div class="container">
+            <div class="row">
+                <!-- İletişim Bilgileri -->
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-4">İletişim Bilgileri</h5>
+                    {% if request.path|slice:":11" == "/restaurant" %}
+                        <p><i class="fas fa-map-marker-alt me-2"></i>{{ restaurant_info.address }}</p>
+                        <p><i class="fas fa-phone me-2"></i>{{ restaurant_info.phone }}</p>
+                        <p><i class="fas fa-envelope me-2"></i>{{ restaurant_info.email }}</p>
+                    {% elif request.path|slice:":4" == "/bar" %}
+                        <p><i class="fas fa-map-marker-alt me-2"></i>{{ bar_info.address }}</p>
+                        <p><i class="fas fa-phone me-2"></i>{{ bar_info.phone }}</p>
+                        <p><i class="fas fa-envelope me-2"></i>{{ bar_info.email }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Hızlı Linkler -->
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-4">Hızlı Linkler</h5>
+                    {% if request.path|slice:":11" == "/restaurant" %}
+                        <ul class="list-unstyled">
+                            <li><a href="{% url 'restaurant:home' %}">Ana Sayfa</a></li>
+                            <li><a href="{% url 'restaurant:menu' %}">Menü</a></li>
+                            <li><a href="{% url 'restaurant:reservation' %}">Rezervasyon</a></li>
+                        </ul>
+                    {% elif request.path|slice:":4" == "/bar" %}
+                        <ul class="list-unstyled">
+                            <li><a href="{% url 'bar:home' %}">Ana Sayfa</a></li>
+                            <li><a href="{% url 'bar:drinks' %}">İçecekler</a></li>
+                            <li><a href="{% url 'bar:events' %}">Etkinlikler</a></li>
+                            <li><a href="{% url 'bar:reservation' %}">Rezervasyon</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Çalışma Saatleri -->
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-4">Çalışma Saatleri</h5>
+                    {% if request.path|slice:":11" == "/restaurant" %}
+                        {% for day, hours in restaurant_info.get_working_hours.items %}
+                        <div class="working-hours-row">
+                            <span class="day">{{ day }}</span>
+                            <span class="hours">{{ hours }}</span>
+                        </div>
+                        {% endfor %}
+                    {% elif request.path|slice:":4" == "/bar" %}
+                        {% for day, hours in bar_info.get_working_hours.items %}
+                        <div class="working-hours-row">
+                            <span class="day">{{ day }}</span>
+                            <span class="hours">{{ hours }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        {% for day, hours in restaurant_info.get_working_hours.items %}
+                        <div class="working-hours-row">
+                            <span class="day">{{ day }}</span>
+                            <span class="hours">{{ hours }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="social-links mt-3">
+                        <a href="#" class="me-3"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+    {% endblock %}
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+    <script>
+        // Mesajların otomatik kaybolması
+        document.addEventListener('DOMContentLoaded', function() {
+            var messages = document.querySelectorAll('.alert');
+            messages.forEach(function(message) {
+                setTimeout(function() {
+                    var alert = bootstrap.Alert.getOrCreateInstance(message);
+                    alert.close();
+                }, 5000); // 5 saniye sonra kaybol
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                document.querySelector('.navbar').classList.add('scrolled');
+            } else {
+                document.querySelector('.navbar').classList.remove('scrolled');
+            }
+        });
+
+        // Dropdown menü işlevselliği
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            
+            dropdowns.forEach(function(dropdown) {
+                var dropdownMenu = dropdown.querySelector('.dropdown-menu');
+                var dropdownToggle = dropdown.querySelector('.dropdown-toggle');
+                var timeoutId;
+
+                // Mouse enter olayı
+                dropdown.addEventListener('mouseenter', function() {
+                    clearTimeout(timeoutId);
+                    dropdowns.forEach(function(otherDropdown) {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
+                        }
+                    });
+                    dropdownMenu.classList.add('show');
+                });
+
+                // Mouse leave olayı
+                dropdown.addEventListener('mouseleave', function() {
+                    timeoutId = setTimeout(function() {
+                        dropdownMenu.classList.remove('show');
+                    }, 200);
+                });
+
+                // Tıklama olayı
+                dropdownToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdowns.forEach(function(otherDropdown) {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
+                        }
+                    });
+                    dropdownMenu.classList.toggle('show');
+                });
+
+                // Dropdown menü içindeki linkler için tıklama olayı
+                dropdownMenu.querySelectorAll('.dropdown-item').forEach(function(item) {
+                    item.addEventListener('click', function(e) {
+                        if (this.getAttribute('href')) {
+                            window.location.href = this.getAttribute('href');
+                        }
+                    });
+                });
+            });
+
+            // Sayfa dışına tıklandığında tüm menüleri kapat
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+                        menu.classList.remove('show');
+                    });
+                }
+            });
+        });
+
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // Initialize Fancybox
+        $('[data-fancybox]').fancybox({
+            buttons: [
+                "zoom",
+                "share",
+                "slideShow",
+                "fullScreen",
+                "close"
+            ],
+            loop: true,
+            protect: true
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

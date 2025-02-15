@@ -1,0 +1,528 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ bar_info.name }} - Bar{% endblock %}
+
+{% block header %}
+{% include 'bar/header.html' %}
+{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+<style>
+    /* Global Styles */
+    :root {
+        --primary-color: #F39600;
+        --secondary-color: #2C3E50;
+        --accent-color: #E67E22;
+        --text-color: #2C3E50;
+        --light-bg: #F8F9FA;
+    }
+
+    body {
+        color: var(--text-color);
+    }
+
+    /* Hero Section Styles */
+    .hero-section {
+        position: relative;
+        min-height: 80vh;
+        background-color: var(--secondary-color);
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7));
+        z-index: 1;
+    }
+
+    .hero-section .container {
+        position: relative;
+        z-index: 2;
+        padding: 4rem 0;
+    }
+
+    .hero-section h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-section .lead {
+        font-size: 1.5rem;
+        font-weight: 400;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        max-width: 800px;
+        margin: 0 auto 2rem;
+    }
+
+    /* Featured Drinks Section */
+    .featured-drinks {
+        background-color: white;
+        padding: 5rem 0;
+    }
+
+    .featured-drinks h2 {
+        font-size: 2.5rem;
+        color: var(--secondary-color);
+        margin-bottom: 3rem;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .featured-drinks h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .card-body {
+        padding: 1.2rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: var(--secondary-color);
+    }
+
+    .card-text {
+        color: #6c757d;
+        margin-bottom: 0.8rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .card-footer {
+        padding: 1rem;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+    }
+
+    .text-primary {
+        font-size: 1.1rem;
+    }
+
+    /* Event Section Styles */
+    .upcoming-events {
+        background-color: var(--light-bg);
+        padding: 5rem 0;
+    }
+
+    .upcoming-events h2 {
+        font-size: 2.5rem;
+        color: var(--secondary-color);
+        margin-bottom: 3rem;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .upcoming-events h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .event-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+        background-color: white;
+    }
+
+    .event-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 2;
+    }
+
+    .event-badge .badge {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    .event-card .card-text {
+        font-size: 0.95rem;
+    }
+
+    .event-card .card-text i {
+        width: 20px;
+        color: var(--primary-color);
+    }
+
+    /* Contact Info Section */
+    .footer {
+        background: linear-gradient(135deg, #1a1c20 0%, #2C3E50 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(to right, var(--primary-color), #E67E22);
+        box-shadow: 0 0 20px rgba(243, 150, 0, 0.5);
+    }
+
+    .footer::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, rgba(243, 150, 0, 0.05) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .footer h5 {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .footer p {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .footer a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .footer a:hover {
+        color: var(--primary-color);
+    }
+
+    .footer .social-links a {
+        font-size: 1.5rem;
+    }
+
+    /* Button Styles */
+    .btn {
+        border-radius: 30px;
+        padding: 0.8rem 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-section .lead {
+            font-size: 1.2rem;
+        }
+
+        .featured-drinks h2,
+        .upcoming-events h2 {
+            font-size: 2rem;
+        }
+
+        .card-img-top {
+            height: 180px;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+        }
+
+        .event-badge .badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+    }
+
+    .gallery {
+        background-color: var(--light-bg);
+    }
+
+    .gallery h2 {
+        font-size: 2.5rem;
+        color: var(--secondary-color);
+        margin-bottom: 3rem;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .gallery h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .gallery-item {
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .gallery-item:hover img {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    #galleryCarousel {
+        padding: 0 50px;
+    }
+
+    #galleryCarousel .carousel-control-prev,
+    #galleryCarousel .carousel-control-next {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-color);
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.8;
+    }
+
+    #galleryCarousel .carousel-control-prev {
+        left: 0;
+    }
+
+    #galleryCarousel .carousel-control-next {
+        right: 0;
+    }
+
+    #galleryCarousel .carousel-control-prev:hover,
+    #galleryCarousel .carousel-control-next:hover {
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .gallery h2 {
+            font-size: 2rem;
+        }
+
+        .gallery-item img {
+            height: 200px;
+        }
+
+        #galleryCarousel {
+            padding: 0 30px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bar-home">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section {% if bar_info.hero_image %}custom-hero{% else %}default-hero{% endif %}">
+            <div class="container text-center text-white">
+                <h1 class="display-4 mb-3 fw-bold" data-aos="fade-up">{% if bar_info.hero_title %}{{ bar_info.hero_title }}{% else %}{{ bar_info.name }}{% endif %}</h1>
+                <p class="lead mb-4 fs-4" data-aos="fade-up" data-aos-delay="100">{% if bar_info.hero_subtitle %}{{ bar_info.hero_subtitle }}{% else %}Keyifli anlar ve özel kokteyller için sizleri bekliyoruz{% endif %}</p>
+                <a href="{% url 'bar:reservation' %}" class="btn btn-primary btn-lg px-4 py-2" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-calendar-alt me-2"></i>Rezervasyon Yap
+                </a>
+            </div>
+        </section>
+
+        <!-- Featured Drinks -->
+        <section class="featured-drinks py-5">
+            <div class="container">
+                <h2 class="text-center mb-5" data-aos="fade-up">Öne Çıkan İçecekler</h2>
+                <div class="row">
+                    {% for drink in featured_drinks %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="card h-100 shadow-lg">
+                            <img src="{{ drink.image.url }}" class="card-img-top" alt="{{ drink.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ drink.name }}</h5>
+                                <p class="card-text">{{ drink.description|safe|truncatewords:20 }}</p>
+                                <p class="card-text"><small class="text-muted">{{ drink.ingredients }}</small></p>
+                                <p class="card-text"><strong class="text-primary">{{ drink.price }} ₺</strong></p>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 text-center">
+                                <a href="{% url 'bar:drink_detail' drink.slug %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'bar:drinks' %}" class="btn btn-outline-primary btn-lg" data-aos="fade-up">
+                        <i class="fas fa-cocktail me-2"></i>Tüm İçecekleri Gör
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upcoming Events -->
+        <section class="upcoming-events py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5" data-aos="fade-up">Yaklaşan Etkinlikler</h2>
+                <div class="row g-4">
+                    {% for event in upcoming_events %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter 1 100 %}">
+                        <div class="card event-card h-100">
+                            {% if event.date < today %}
+                                <div class="event-badge">
+                                    <span class="badge bg-secondary">Etkinlik Sona Erdi</span>
+                                </div>
+                                <img src="{{ event.image.url }}" class="card-img-top past-event" alt="{{ event.title }}">
+                            {% else %}
+                                <div class="event-badge">
+                                    <span class="badge bg-primary">
+                                        {% if event.date == today %}
+                                            Bugün
+                                        {% else %}
+                                            {{ event.date|timeuntil }} kaldı
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="card-text">{{ event.description|safe|truncatewords:20 }}</p>
+                                <p class="card-text">
+                                    <i class="fas fa-calendar me-2"></i>{{ event.date }}<br>
+                                    <i class="fas fa-clock me-2"></i>{{ event.time }}<br>
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
+                                </p>
+                                {% if event.price %}
+                                    <p class="card-text"><strong class="text-primary">{{ event.price }} ₺</strong></p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent border-0 text-center">
+                                <a href="{% url 'bar:event_detail' event.slug %}" class="btn {% if event.date < today %}btn-outline-secondary{% else %}btn-outline-primary{% endif %}">
+                                    <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'bar:events' %}" class="btn btn-outline-primary btn-lg" data-aos="fade-up">
+                        <i class="fas fa-calendar-alt me-2"></i>Tüm Etkinlikleri Gör
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section class="gallery py-5">
+            <div class="container">
+                <h2 class="text-center mb-5" data-aos="fade-up">Galeri</h2>
+                <div class="row g-4">
+                    {% for image in gallery_images %}
+                        <div class="col-md-4">
+                            <div class="gallery-item" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter 1 100 %}">
+                                <a href="{{ image.image.url }}" data-fancybox="gallery" data-caption="{{ image.title }}">
+                                    <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid rounded shadow">
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% endblock %} 

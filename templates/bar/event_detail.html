@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} - {{ bar_info.name }}{% endblock %}
+
+{% block header %}
+{% include 'bar/header.html' %}
+{% endblock %}
+
+{% block extra_css %}
+{% if event.image %}
+<style>
+    .event-hero {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ event.image.url }}');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .event-image {
+        height: 100%;
+        min-height: 400px;
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-bottom-left-radius: 15px;
+    }
+    
+    @media (max-width: 767px) {
+        .event-image {
+            border-radius: 15px 15px 0 0;
+            min-height: 300px;
+        }
+    }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="bar-events">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section event-hero">
+            <div class="container text-center text-white py-5">
+                <h1 class="display-4 mb-4">{{ event.title }}</h1>
+                <p class="lead">
+                    <i class="far fa-calendar-alt me-2"></i>{{ event.date|date:"d F Y" }}
+                    <i class="far fa-clock ms-3 me-2"></i>{{ event.time|time:"H:i" }}
+                </p>
+            </div>
+        </section>
+
+        <!-- Event Detail Section -->
+        <section class="event-detail py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="card shadow-lg overflow-hidden">
+                            <div class="row g-0">
+                                <!-- Event Image -->
+                                <div class="col-md-5">
+                                    {% if event.image %}
+                                        <img src="{{ event.image.url }}" class="event-image w-100" alt="{{ event.title }}">
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Event Info -->
+                                <div class="col-md-7">
+                                    <div class="card-body p-4">
+                                        <h2 class="card-title mb-3">{{ event.title }}</h2>
+                                        <div class="mb-4">{{ event.description|safe }}</div>
+                                        <div class="event-details mb-4">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>{{ event.location }}</p>
+                                                    <p><i class="far fa-calendar-alt me-2 text-primary"></i>{{ event.date|date:"d F Y" }}</p>
+                                                    <p><i class="far fa-clock me-2 text-primary"></i>{{ event.time|time:"H:i" }}</p>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    {% if event.capacity %}
+                                                        <p><i class="fas fa-users me-2 text-primary"></i>Kapasite: {{ event.capacity }} kişi</p>
+                                                    {% endif %}
+                                                    {% if event.price %}
+                                                        <p><i class="fas fa-ticket-alt me-2 text-primary"></i>Giriş: {{ event.price }} TL</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'bar:reservation' %}" class="btn btn-primary btn-lg">
+                                                <i class="fas fa-calendar-alt me-2"></i>Rezervasyon Yap
+                                            </a>
+                                            <a href="{% url 'bar:events' %}" class="btn btn-outline-primary">
+                                                <i class="fas fa-arrow-left me-2"></i>Tüm Etkinliklere Dön
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Events Section -->
+        {% if other_events %}
+        <section class="other-events py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Diğer Etkinlikler</h2>
+                <div class="row">
+                    {% for other_event in other_events %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                {% if other_event.image %}
+                                    <img src="{{ other_event.image.url }}" class="card-img-top" alt="{{ other_event.title }}" style="height: 200px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ other_event.title }}</h5>
+                                    <p class="card-text text-muted">
+                                        <i class="far fa-calendar-alt me-2"></i>{{ other_event.date|date:"d F Y" }}
+                                        <i class="far fa-clock ms-3 me-2"></i>{{ other_event.time|time:"H:i" }}
+                                    </p>
+                                    <p class="card-text">{{ other_event.description|truncatewords:20 }}</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <a href="{% url 'bar:event_detail' other_event.slug %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+</div>
+{% endblock %} 

@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Etkinlikler - {{ bar_info.name }}{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+<style>
+    .event-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        background-color: white;
+    }
+    
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .event-card .card-img-top {
+        height: 250px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+    
+    .event-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+    
+    .event-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .event-card .card-title {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+    
+    .event-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .event-info i {
+        width: 20px;
+        color: var(--primary-color);
+        margin-right: 8px;
+    }
+    
+    .event-description {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 1rem 0;
+    }
+    
+    .event-price {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+        font-weight: 600;
+        margin: 1rem 0;
+    }
+    
+    .btn-reservation {
+        width: 100%;
+        padding: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-reservation:hover {
+        transform: translateY(-2px);
+    }
+    
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        padding: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .events-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .event-card .card-img-top {
+            height: 200px;
+        }
+    }
+
+    .event-card:nth-child(1) { animation-delay: 100ms; }
+    .event-card:nth-child(2) { animation-delay: 200ms; }
+    .event-card:nth-child(3) { animation-delay: 300ms; }
+    .event-card:nth-child(4) { animation-delay: 400ms; }
+    .event-card:nth-child(5) { animation-delay: 500ms; }
+    .event-card:nth-child(6) { animation-delay: 600ms; }
+
+    .event-badge {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 2;
+    }
+    
+    .event-badge .badge {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        border-radius: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .badge.bg-primary {
+        background: rgba(243, 150, 0, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .badge.bg-secondary {
+        background: rgba(108, 117, 125, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .event-card .position-relative {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .event-card .position-relative::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+    
+    .past-event {
+        opacity: 0.8;
+    }
+    
+    .past-event .card-img-top {
+        filter: grayscale(30%);
+    }
+    
+    .past-event:hover {
+        opacity: 1;
+    }
+    
+    .past-event:hover .card-img-top {
+        filter: grayscale(0%);
+    }
+    
+    h2 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+    
+    h2:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--primary-color);
+        border-radius: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bar-home events-page">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section {% if bar_info.hero_image %}custom-hero{% elif latest_event and latest_event.image %}event-hero{% else %}default-hero{% endif %}" {% if latest_event and latest_event.image %}style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ latest_event.image.url }}');"{% endif %}>
+            <div class="container text-center text-white">
+                <h1 class="display-4 mb-4" data-aos="fade-up">Etkinlikler</h1>
+                <p class="lead" data-aos="fade-up" data-aos-delay="100">Özel etkinliklerimiz ve canlı performanslar</p>
+            </div>
+        </section>
+
+        <!-- Events Section -->
+        <section class="events-section py-5">
+            <div class="container">
+                {% if events %}
+                    <h2 class="text-center mb-5" data-aos="fade-up">Etkinlikler</h2>
+                    <div class="row g-4">
+                        {% for event in events %}
+                        <div class="col-md-4 mb-4" data-aos="fade-up">
+                            <div class="card event-card h-100">
+                                {% if event.date < today %}
+                                    <div class="event-badge">
+                                        <span class="badge bg-secondary">Etkinlik Sona Erdi</span>
+                                    </div>
+                                    <img src="{{ event.image.url }}" class="card-img-top past-event" alt="{{ event.title }}">
+                                {% else %}
+                                    <div class="event-badge">
+                                        <span class="badge bg-primary">
+                                            {% if event.date == today %}
+                                                Bugün
+                                            {% else %}
+                                                {{ event.date|timeuntil }} kaldı
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event.title }}</h5>
+                                    <p class="card-text">{{ event.description|safe|truncatewords:20 }}</p>
+                                    <p class="card-text">
+                                        <i class="fas fa-calendar me-2"></i>{{ event.date }}<br>
+                                        <i class="fas fa-clock me-2"></i>{{ event.time }}<br>
+                                        <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
+                                    </p>
+                                    {% if event.price %}
+                                    <p class="card-text"><strong class="text-primary">{{ event.price }} ₺</strong></p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <a href="{% url 'bar:event_detail' event.slug %}" class="btn {% if event.date < today %}btn-outline-secondary{% else %}btn-outline-primary{% endif %}">
+                                        <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <h3>Şu anda planlanmış bir etkinlik bulunmamaktadır.</h3>
+                        <p class="text-muted">Yakında yeni etkinliklerimiz olacak!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %} 

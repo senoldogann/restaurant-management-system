@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - {{ restaurant_info.name }}{% endblock %}
+
+{% block header %}
+{% include 'restaurant/header.html' %}
+{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+{% endblock %}
+
+{% block content %}
+<div class="restaurant-home">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section {% if restaurant_info.hero_image %}custom-hero{% else %}default-hero{% endif %}">
+            <div class="container text-center text-white py-5">
+                <h1 class="display-4 mb-4">{{ category.name }}</h1>
+                {% if category.description %}
+                    <p class="lead">{{ category.description }}</p>
+                {% endif %}
+                <a href="{% url 'restaurant:menu' %}" class="btn btn-outline-light btn-lg mt-3">
+                    <i class="fas fa-arrow-left me-2"></i>Menüye Geri Dön
+                </a>
+            </div>
+        </section>
+
+        <!-- Menu Items Section -->
+        <section class="menu-items py-5">
+            <div class="container">
+                {% if menu_items %}
+                    <div class="row">
+                        {% for item in menu_items %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    {% if item.image %}
+                                        <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ item.name }}</h5>
+                                        <p class="card-text">{{ item.description|safe|truncatewords:20 }}</p>
+                                        <p class="card-text">
+                                            <strong class="text-primary">{{ item.price }} ₺</strong>
+                                        </p>
+                                    </div>
+                                    <div class="card-footer bg-transparent border-0 text-center">
+                                        <a href="{% url 'restaurant:menu_item_detail' item.slug %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <h3>Bu kategoride henüz ürün bulunmamaktadır.</h3>
+                        <a href="{% url 'restaurant:menu' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-arrow-left me-2"></i>Menüye Dön
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Back to Menu -->
+        <section class="py-4 bg-light">
+            <div class="container text-center">
+                <a href="{% url 'restaurant:menu' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-utensils me-2"></i>Tüm Menüyü Gör
+                </a>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %} 

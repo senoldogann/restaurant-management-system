@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% block title %}Giriş Yap - Food & Drink{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-wrapper">
+        <div class="auth-side">
+            <div class="auth-image"></div>
+            <div class="auth-overlay"></div>
+            <div class="auth-text">
+                <h2>Food & Drink'e<br>Hoş Geldiniz</h2>
+                <p>Lezzetli yemekler ve özel içecekler için giriş yapın.</p>
+            </div>
+        </div>
+        <div class="auth-form">
+            <div class="form-wrapper">
+                <div class="brand-logo">
+                    <i class="fas fa-utensils"></i>
+                    <span>Food & Drink</span>
+                </div>
+                <h1>Giriş Yap</h1>
+                <p class="text-muted mb-4">Hesabınıza erişmek için giriş yapın</p>
+
+                <form method="post" class="login-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas {% if field.name == 'username' %}fa-user{% else %}fa-lock{% endif %}"></i>
+                                </span>
+                                {{ field }}
+                            </div>
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger mt-2">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="remember">
+                            <label class="form-check-label" for="remember">Beni Hatırla</label>
+                        </div>
+                        <a href="#" class="forgot-password">Şifremi Unuttum</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                    </button>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Hesabınız yok mu? <a href="{% url 'register' %}" class="register-link">Kayıt Ol</a></p>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>Ana Sayfaya Git
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: #f8f9fa;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .auth-wrapper {
+        width: 100%;
+        max-width: 1200px;
+        min-height: 600px;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .auth-side {
+        width: 50%;
+        position: relative;
+        background: #2C3E50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        color: white;
+    }
+
+    .auth-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.0.3') center/cover;
+        opacity: 0.3;
+    }
+
+    .auth-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(243, 150, 0, 0.9), rgba(230, 126, 34, 0.9));
+        mix-blend-mode: multiply;
+    }
+
+    .auth-text {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .auth-text h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .auth-text p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .auth-form {
+        width: 50%;
+        padding: 3rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-wrapper {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2C3E50;
+    }
+
+    .brand-logo i {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-right: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #2C3E50;
+        margin-bottom: 0.5rem;
+    }
+
+    .input-group {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .input-group-text {
+        background: #f8f9fa;
+        border: none;
+        color: #6c757d;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control {
+        border: none;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        background: #fff;
+    }
+
+    .forgot-password {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .forgot-password:hover {
+        color: #E67E22;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-color), #E67E22);
+        border: none;
+        padding: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(243, 150, 0, 0.3);
+    }
+
+    .register-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .register-link:hover {
+        color: #E67E22;
+    }
+
+    @media (max-width: 768px) {
+        .auth-wrapper {
+            flex-direction: column;
+        }
+
+        .auth-side {
+            width: 100%;
+            padding: 2rem;
+            min-height: 300px;
+        }
+
+        .auth-form {
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .auth-text h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %} 

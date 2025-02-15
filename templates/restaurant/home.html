@@ -1,0 +1,547 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ restaurant_info.name }} - Restaurant{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+<style>
+    /* Global Styles */
+    :root {
+        --primary-color: #f39600;
+        --primary-color-rgb: 243, 150, 0;
+        --secondary-color: #2C3E50;
+        --accent-color: #E67E22;
+        --text-color: #2C3E50;
+        --light-bg: #F8F9FA;
+    }
+
+    body {
+        color: var(--text-color);
+    }
+
+    /* Hero Section Styles */
+    .hero-section {
+        position: relative;
+        min-height: 90vh;
+        background-color: var(--secondary-color);
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7));
+        z-index: 1;
+    }
+
+    .hero-section .container {
+        position: relative;
+        z-index: 2;
+        padding: 6rem 0;
+    }
+
+    .hero-section h1 {
+        font-size: 4rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        margin-bottom: 1.5rem;
+        letter-spacing: -1px;
+    }
+
+    .hero-section .lead {
+        font-size: 1.5rem;
+        font-weight: 400;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        max-width: 800px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.6;
+    }
+
+    /* Featured Items Section */
+    .featured-items {
+        background-color: white;
+        padding: 6rem 0;
+    }
+
+    .featured-items h2 {
+        font-size: 2.5rem;
+        color: var(--secondary-color);
+        margin-bottom: 3.5rem;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .featured-items h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover .card-img-top {
+        transform: scale(1.03);
+    }
+
+    .card-body {
+        padding: 1.2rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: var(--secondary-color);
+    }
+
+    .card-text {
+        color: #6c757d;
+        margin-bottom: 0.8rem;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    .text-primary {
+        color: var(--primary-color) !important;
+        font-size: 1.1rem;
+    }
+
+    .card-footer {
+        padding: 1rem;
+        background-color: transparent;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* Contact Info Section */
+    .contact-info {
+        padding: 5rem 0;
+        background-color: var(--secondary-color);
+        color: white;
+        position: relative;
+    }
+
+    .contact-info::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+    }
+
+    .contact-info h2 {
+        font-size: 2.2rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        color: white;
+    }
+
+    .contact-info .info-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .contact-info .info-box:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .contact-info i {
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .contact-info h5 {
+        font-size: 1.2rem;
+        color: white;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .contact-info p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        margin-bottom: 0;
+        line-height: 1.6;
+    }
+
+    .map-container {
+        height: 400px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .social-links {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .social-links a {
+        color: white;
+        font-size: 1.5rem;
+        margin: 0 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .social-links a:hover {
+        color: var(--primary-color);
+        transform: translateY(-3px);
+    }
+
+    @media (max-width: 768px) {
+        .map-container {
+            height: 300px;
+            margin-top: 2rem;
+        }
+
+        .contact-info h2 {
+            font-size: 1.8rem;
+        }
+
+        .contact-info .info-box {
+            padding: 1.5rem;
+        }
+    }
+
+    /* Button Styles */
+    .btn {
+        border-radius: 30px;
+        padding: 1rem 2.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn i {
+        font-size: 1rem;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .hero-section {
+            min-height: 60vh;
+        }
+
+        .hero-section h1 {
+            font-size: 2.8rem;
+        }
+
+        .hero-section .lead {
+            font-size: 1.2rem;
+        }
+
+        .featured-items h2 {
+            font-size: 2rem;
+        }
+
+        .card-img-top {
+            height: 180px;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+        }
+
+        .text-primary {
+            font-size: 1rem;
+        }
+
+        .contact-info i {
+            font-size: 2.2rem;
+        }
+
+        .contact-info h5 {
+            font-size: 1.2rem;
+        }
+
+        .contact-info p {
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+        }
+    }
+
+    .gallery {
+        background-color: var(--light-bg);
+    }
+
+    .gallery h2 {
+        font-size: 2.5rem;
+        color: var(--secondary-color);
+        margin-bottom: 3rem;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .gallery h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .gallery-item {
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .gallery-item:hover img {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    #galleryCarousel {
+        padding: 0 50px;
+    }
+
+    #galleryCarousel .carousel-control-prev,
+    #galleryCarousel .carousel-control-next {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-color);
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.8;
+    }
+
+    #galleryCarousel .carousel-control-prev {
+        left: 0;
+    }
+
+    #galleryCarousel .carousel-control-next {
+        right: 0;
+    }
+
+    #galleryCarousel .carousel-control-prev:hover,
+    #galleryCarousel .carousel-control-next:hover {
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .gallery h2 {
+            font-size: 2rem;
+        }
+
+        .gallery-item img {
+            height: 200px;
+        }
+
+        #galleryCarousel {
+            padding: 0 30px;
+        }
+    }
+
+    /* Footer Styles */
+    .footer {
+        background: linear-gradient(135deg, #1a1c20 0%, #2C3E50 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(to right, var(--primary-color), #E67E22);
+        box-shadow: 0 0 20px rgba(243, 150, 0, 0.5);
+    }
+
+    .footer::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, rgba(243, 150, 0, 0.05) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .footer h5 {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .footer p {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .footer a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .footer a:hover {
+        color: var(--primary-color);
+    }
+
+    .footer .social-links a {
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="restaurant-home">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section {% if restaurant_info.hero_image %}custom-hero{% else %}default-hero{% endif %}">
+            <div class="container text-center text-white">
+                <h1 class="display-4 mb-3 fw-bold" data-aos="fade-up">{% if restaurant_info.hero_title %}{{ restaurant_info.hero_title }}{% else %}{{ restaurant_info.name }}{% endif %}</h1>
+                <p class="lead mb-4 fs-4" data-aos="fade-up" data-aos-delay="100">{% if restaurant_info.hero_subtitle %}{{ restaurant_info.hero_subtitle }}{% else %}Eşsiz lezzetler ve unutulmaz anlar için sizleri bekliyoruz{% endif %}</p>
+                <a href="{% url 'restaurant:reservation' %}" class="btn btn-primary btn-lg px-4 py-2" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-calendar-alt me-2"></i>Rezervasyon Yap
+                </a>
+            </div>
+        </section>
+
+        <!-- Featured Menu Items -->
+        <section class="featured-items py-5">
+            <div class="container">
+                <h2 class="text-center mb-5" data-aos="fade-up">Öne Çıkan Menü</h2>
+                <div class="row">
+                    {% for item in featured_items %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="card h-100 shadow-lg">
+                            {% if item.image %}
+                                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                            {% else %}
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+                                    <i class="fas fa-utensils fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text">{{ item.description|safe|truncatewords:20 }}</p>
+                                <p class="card-text"><strong class="text-primary">{{ item.price }} ₺</strong></p>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 text-center">
+                                <a href="{% url 'restaurant:menu_item_detail' item.slug %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'restaurant:menu' %}" class="btn btn-outline-primary btn-lg" data-aos="fade-up">
+                        <i class="fas fa-utensils me-2"></i>Tüm Menüyü Gör
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section class="gallery py-5">
+            <div class="container">
+                <h2 class="text-center mb-5" data-aos="fade-up">Galeri</h2>
+                <div class="row g-4">
+                    {% for image in gallery_images %}
+                        <div class="col-md-4">
+                            <div class="gallery-item" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter 1 100 %}">
+                                <a href="{{ image.image.url }}" data-fancybox="gallery" data-caption="{{ image.title }}">
+                                    <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid rounded shadow">
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% endblock %} 

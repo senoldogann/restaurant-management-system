@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Rezervasyon - {{ bar_info.name }}{% endblock %}
+
+{% block header %}
+{% include 'bar/header.html' %}
+{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+<style>
+    .reservation-form {
+        background-color: rgba(255, 255, 255, 0.98);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    .form-control {
+        border: 1px solid #e0e0e0;
+        border-radius: var(--border-radius);
+        padding: 0.8rem 1.2rem;
+        font-size: 0.95rem;
+        color: #495057;
+        transition: var(--transition);
+        background-color: var(--light-color);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.15);
+        background-color: #fff;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: none;
+    }
+
+    .btn-submit {
+        padding: 1rem 2rem;
+        letter-spacing: 0.5px;
+        font-size: 1rem;
+        border-radius: 12px;
+        background-color: var(--primary-color);
+        border: none;
+        transition: var(--transition);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.3);
+    }
+
+    .contact-info-card {
+        border: none;
+        border-radius: var(--border-radius);
+        background-color: rgba(255, 255, 255, 0.98);
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+    }
+
+    .contact-info-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(var(--primary-color-rgb), 0.1);
+        color: var(--primary-color);
+        border-radius: var(--border-radius);
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+   
+
+    .upcoming-events {
+        margin-top: 3rem;
+    }
+
+    .event-card {
+        border: none;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--box-shadow);
+    }
+
+    .event-card img {
+        height: 200px;
+        object-fit: cover;
+    }
+
+   
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bar-home reservation-page">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section {% if bar_info.hero_image %}custom-hero{% else %}default-hero{% endif %}">
+            <div class="container text-center text-white py-4">
+                <h1 class="h2 mb-2" data-aos="fade-up">Rezervasyon</h1>
+                <p class="lead mb-0" data-aos="fade-up" data-aos-delay="100">Özel anlarınız için hemen rezervasyon yapın</p>
+            </div>
+        </section>
+
+        <!-- Reservation Form Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <!-- Form Column -->
+                    <div class="col-lg-8" data-aos="fade-up">
+                        <div class="reservation-form p-4 p-lg-5">
+                            <h3 class="h4 mb-4 text-center">Rezervasyon Formu</h3>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        {{ form.name|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.email|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.phone|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.guests|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.date|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.time|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.event|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.notes|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-submit btn-lg">
+                                            <i class="fas fa-calendar-check me-2"></i>Rezervasyon Yap
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info Column -->
+                    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="contact-info-card p-4">
+                            <div class="text-center mb-4">
+                                <div class="contact-icon mx-auto">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <h5>Adres</h5>
+                                <p class="mb-0">{{ bar_info.address }}</p>
+                            </div>
+                            <div class="text-center mb-4">
+                                <div class="contact-icon mx-auto">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <h5>Telefon</h5>
+                                <p class="mb-0">{{ bar_info.phone }}</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="contact-icon mx-auto">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h5>Çalışma Saatleri</h5>
+                                <p class="mb-0">{{ bar_info.opening_hours }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upcoming Events Section -->
+        {% if upcoming_events %}
+        <section class="upcoming-events py-5 bg-light">
+            <div class="container">
+                <h3 class="h4 text-center mb-4" data-aos="fade-up">Yaklaşan Etkinlikler</h3>
+                <div class="row g-4">
+                    {% for event in upcoming_events %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter 1 100 %}">
+                        <div class="event-card h-100">
+                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                            <div class="card-body p-4">
+                                <h5 class="card-title h6">{{ event.title }}</h5>
+                                <p class="card-text small text-muted">
+                                    <i class="fas fa-calendar me-2"></i>{{ event.date }}<br>
+                                    <i class="fas fa-clock me-2"></i>{{ event.time }}<br>
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
+                                </p>
+                                {% if event.price %}
+                                <p class="card-text"><strong class="text-primary">{{ event.price }} ₺</strong></p>
+                                {% endif %}
+                                <a href="{% url 'bar:event_detail' event.slug %}" class="btn btn-outline-primary btn-sm mt-2">
+                                    <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+</div>
+{% endblock %} 

@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profil - {{ user.get_full_name }}{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container py-5 mt-4">
+        <!-- Geri Dönüş Butonları -->
+        <div class="navigation-buttons mb-4">
+            <a href="{% url 'restaurant:home' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-utensils me-2"></i>Restorana Dön
+            </a>
+            <a href="{% url 'bar:home' %}" class="btn btn-outline-primary">
+                <i class="fas fa-glass-martini-alt me-2"></i>Bara Dön
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Profil Bilgileri -->
+            <div class="col-lg-4 mb-4">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            {% if user.userprofile.profile_picture %}
+                                <img src="{{ user.userprofile.profile_picture.url }}" alt="{{ user.get_full_name }}" class="profile-image">
+                            {% else %}
+                                <div class="profile-image-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <h2 class="profile-name">{{ user.get_full_name }}</h2>
+                        <p class="profile-username">@{{ user.username }}</p>
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>{{ user.email }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>{{ user.userprofile.phone_number|default:"Telefon numarası eklenmemiş" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Üyelik: {{ user.date_joined|date:"d.m.Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="profile-bio">
+                        <h5>Hakkımda</h5>
+                        <p>{{ user.userprofile.bio|default:"Henüz bir biyografi eklenmemiş." }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Değerlendirmeler -->
+            <div class="col-lg-8">
+                <div class="reviews-card">
+                    <div class="reviews-header">
+                        <h3><i class="fas fa-star me-2"></i>Değerlendirmelerim</h3>
+                    </div>
+                    <div class="reviews-list">
+                        {% if reviews %}
+                            {% for review in reviews %}
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="review-location">
+                                        <i class="fas {% if review.location == 'restaurant' %}fa-utensils{% else %}fa-glass-martini-alt{% endif %} me-2"></i>
+                                        {{ review.location|title }}
+                                    </div>
+                                    <div class="review-date">{{ review.created_at|date:"d.m.Y" }}</div>
+                                </div>
+                                <div class="review-content">
+                                    <h5 class="review-item-name">{{ review.item_name }}</h5>
+                                    <div class="review-rating">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-warning"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <p class="review-comment">{{ review.comment }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-reviews">
+                                <i class="fas fa-comment-slash"></i>
+                                <p>Henüz bir değerlendirme yapmadınız.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f8f9fa;
+        padding-top: 0 !important; /* Header padding'ini kaldır */
+    }
+
+    .profile-page {
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .navigation-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .navigation-buttons .btn {
+        padding: 0.8rem 1.5rem;
+        font-weight: 500;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .navigation-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary-color), #E67E22);
+        padding: 2rem;
+        text-align: center;
+        color: white;
+    }
+
+    .profile-avatar {
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-image,
+    .profile-image-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-image-placeholder {
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .profile-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-username {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .profile-info {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.8rem;
+        color: #6c757d;
+    }
+
+    .info-item i {
+        width: 24px;
+        margin-right: 10px;
+        color: var(--primary-color);
+    }
+
+    .profile-bio {
+        padding: 1.5rem;
+    }
+
+    .profile-bio h5 {
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .reviews-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .reviews-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .reviews-header h3 {
+        margin: 0;
+        color: var(--secondary-color);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .reviews-list {
+        padding: 1.5rem;
+    }
+
+    .review-item {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .review-location {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    .review-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .review-item-name {
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .review-rating {
+        margin-bottom: 0.8rem;
+    }
+
+    .review-comment {
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .no-reviews {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+
+    .no-reviews i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+        .profile-card {
+            margin-bottom: 2rem;
+        }
+
+        .navigation-buttons {
+            flex-direction: column;
+        }
+
+        .navigation-buttons .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %} 

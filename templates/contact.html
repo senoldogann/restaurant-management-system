@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}İletişim{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center text-white py-5">
+            <h1 class="display-4 mb-3" data-aos="fade-up">Bize Ulaşın</h1>
+            <p class="lead mb-0" data-aos="fade-up" data-aos-delay="100">Sorularınız ve önerileriniz için bizimle iletişime geçin</p>
+        </div>
+    </section>
+
+    <!-- İletişim Bilgileri -->
+    <section class="contact-info py-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Restoran Bilgileri -->
+                <div class="col-lg-6">
+                    <div class="info-card h-100" data-aos="fade-up">
+                        <div class="card-header">
+                            <h3 class="mb-0">
+                                <i class="fas fa-utensils me-2"></i>
+                                {{ restaurant_info.name }}
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <h5>Adres</h5>
+                                    <p>{{ restaurant_info.address }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <h5>Telefon</h5>
+                                    <p>{{ restaurant_info.phone }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h5>E-posta</h5>
+                                    <p>{{ restaurant_info.email }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <h5>Çalışma Saatleri</h5>
+                                    {% for day, hours in restaurant_info.get_working_hours.items %}
+                                    <div class="working-hours-row">
+                                        <span class="day">{{ day }}</span>
+                                        <span class="hours">{{ hours }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bar Bilgileri -->
+                <div class="col-lg-6">
+                    <div class="info-card h-100" data-aos="fade-up" data-aos-delay="100">
+                        <div class="card-header">
+                            <h3 class="mb-0">
+                                <i class="fas fa-glass-martini-alt me-2"></i>
+                                {{ bar_info.name }}
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <h5>Adres</h5>
+                                    <p>{{ bar_info.address }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <h5>Telefon</h5>
+                                    <p>{{ bar_info.phone }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h5>E-posta</h5>
+                                    <p>{{ bar_info.email }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <h5>Çalışma Saatleri</h5>
+                                    {% for day, hours in bar_info.get_working_hours.items %}
+                                    <div class="working-hours-row">
+                                        <span class="day">{{ day }}</span>
+                                        <span class="hours">{{ hours }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Harita ve İletişim Formu -->
+    <section class="map-section py-5 bg-light">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Harita -->
+                <div class="col-lg-6" data-aos="fade-up">
+                    <div class="map-container">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6505945819378!2d28.97938611541656!3d41.02757507929921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab9e7a7777c43%3A0x4c76cf3dcc8b330b!2sGalata%20Tower!5e0!3m2!1sen!2str!4v1647856686895!5m2!1sen!2str"
+                            width="100%" 
+                            height="450" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- İletişim Formu -->
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="contact-form-container">
+                        <h3 class="mb-4">Bize Mesaj Gönderin</h3>
+                        <form class="contact-form">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="name" placeholder="Adınız">
+                                        <label for="name">Adınız</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email" placeholder="E-posta">
+                                        <label for="email">E-posta</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="subject" placeholder="Konu">
+                                        <label for="subject">Konu</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="message" placeholder="Mesajınız" style="height: 150px"></textarea>
+                                        <label for="message">Mesajınız</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100 py-3">
+                                        <i class="fas fa-paper-plane me-2"></i>Mesaj Gönder
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-page {
+        background-color: var(--light-color);
+    }
+
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), var(--hero-image, url('/static/images/default-hero.jpg'));
+        background-size: cover;
+        background-position: center;
+        padding: 120px 0 80px;
+        margin-bottom: 2rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        background: var(--primary-color);
+        padding: 1.5rem;
+        border: none;
+    }
+
+    .card-header h3 {
+        color: white;
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-item i {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-right: 1rem;
+        margin-top: 0.2rem;
+    }
+
+    .info-item h5 {
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+        color: var(--secondary-color);
+    }
+
+    .info-item p {
+        margin: 0;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .map-container {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-form-container h3 {
+        color: var(--secondary-color);
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.15);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 100px 0 60px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .info-item i {
+            font-size: 1.2rem;
+        }
+
+        .info-item h5 {
+            font-size: 1rem;
+        }
+    }
+
+    .working-hours-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .working-hours-row:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .working-hours-row .day {
+        font-weight: 500;
+        color: var(--secondary-color);
+        min-width: 100px;
+    }
+
+    .working-hours-row .hours {
+        color: #666;
+    }
+</style>
+{% endblock %} 

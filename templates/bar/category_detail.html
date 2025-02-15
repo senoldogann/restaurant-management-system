@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - {{ bar_info.name }}{% endblock %}
+
+{% block header %}
+{% include 'bar/header.html' %}
+{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+{% endblock %}
+
+{% block content %}
+<div class="bar-home">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section {% if bar_info.hero_image %}custom-hero{% else %}default-hero{% endif %}">
+            <div class="container text-center text-white py-5">
+                <h1 class="display-4 mb-4">{{ category.name }}</h1>
+                {% if category.description %}
+                    <p class="lead">{{ category.description }}</p>
+                {% endif %}
+                <a href="{% url 'bar:drinks' %}" class="btn btn-outline-light btn-lg mt-3">
+                    <i class="fas fa-arrow-left me-2"></i>İçeceklere Geri Dön
+                </a>
+            </div>
+        </section>
+
+        <!-- Drinks Section -->
+        <section class="drinks py-5">
+            <div class="container">
+                {% if drinks %}
+                    <div class="row">
+                        {% for drink in drinks %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    {% if drink.image %}
+                                        <img src="{{ drink.image.url }}" class="card-img-top" alt="{{ drink.name }}">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ drink.name }}</h5>
+                                        <p class="card-text">{{ drink.description|safe|truncatewords:20 }}</p>
+                                        <p class="card-text"><small class="text-muted">{{ drink.ingredients }}</small></p>
+                                        <p class="card-text">
+                                            <strong class="text-primary">{{ drink.price }} ₺</strong>
+                                        </p>
+                                    </div>
+                                    <div class="card-footer bg-transparent border-0 text-center">
+                                        <a href="{% url 'bar:drink_detail' drink.slug %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-info-circle me-2"></i>Detayları Gör
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <h3>Bu kategoride henüz içecek bulunmamaktadır.</h3>
+                        <a href="{% url 'bar:drinks' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-arrow-left me-2"></i>İçeceklere Dön
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Back to Drinks -->
+        <section class="py-4 bg-light">
+            <div class="container text-center">
+                <a href="{% url 'bar:drinks' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-cocktail me-2"></i>Tüm İçecekleri Gör
+                </a>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %} 

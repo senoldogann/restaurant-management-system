@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sayfa Bulunamadı - {{ bar_info.name }}{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+<style>
+    /* Header için özel stil */
+    .navbar {
+        background-color: rgba(0, 0, 0, 0.9) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .error-page {
+        padding: 120px 0;
+        text-align: center;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .error-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .error-title {
+        font-size: 8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        line-height: 1;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .error-subtitle {
+        font-size: 2rem;
+        color: var(--secondary-color);
+        margin-bottom: 2rem;
+    }
+
+    .error-text {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .btn-home {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .error-title {
+            font-size: 6rem;
+        }
+
+        .error-subtitle {
+            font-size: 1.5rem;
+        }
+
+        .error-text {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bar-home">
+    <div class="error-page">
+        <div class="error-content">
+            <h1 class="error-title">404</h1>
+            <h2 class="error-subtitle">Sayfa Bulunamadı</h2>
+            <p class="error-text">Aradığınız etkinlik sona ermiş veya kaldırılmış olabilir. Ana sayfaya dönerek diğer etkinlikleri inceleyebilirsiniz.</p>
+            <a href="{% url 'bar:home' %}" class="btn btn-primary btn-lg btn-home">
+                <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

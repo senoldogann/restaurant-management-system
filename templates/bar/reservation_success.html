@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rezervasyon Başarılı - {{ bar_info.name }}{% endblock %}
+
+{% block extra_css %}
+{{ hero_image_style|safe }}
+{% endblock %}
+
+{% block content %}
+<div class="bar-home">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section {% if bar_info.hero_image %}custom-hero{% else %}default-hero{% endif %}">
+            <div class="container text-center text-white py-5">
+                <h1 class="display-4 mb-4">Rezervasyon Başarılı!</h1>
+                <p class="lead">Rezervasyonunuz başarıyla alınmıştır.</p>
+            </div>
+        </section>
+
+        <!-- Success Message Section -->
+        <section class="success-message py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card shadow-lg">
+                            <div class="card-body p-5 text-center">
+                                <i class="fas fa-check-circle text-success fa-5x mb-4"></i>
+                                <h3 class="card-title mb-4">Teşekkür Ederiz!</h3>
+                                <p class="lead mb-4">Rezervasyonunuz sistemimize kaydedilmiştir. En kısa sürede sizinle iletişime geçeceğiz.</p>
+                                {% if event %}
+                                <div class="alert alert-info mb-4">
+                                    <h5 class="mb-3">Etkinlik Detayları:</h5>
+                                    <p class="mb-2"><strong>{{ event.title }}</strong></p>
+                                    <p class="mb-2"><i class="fas fa-calendar me-2"></i>{{ event.date }}</p>
+                                    <p class="mb-2"><i class="fas fa-clock me-2"></i>{{ event.time }}</p>
+                                    <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}</p>
+                                </div>
+                                {% endif %}
+                                <div class="mt-4">
+                                    <a href="{% url 'bar:bar_home' %}" class="btn btn-primary btn-lg me-3">
+                                        <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+                                    </a>
+                                    <a href="{% url 'bar:events' %}" class="btn btn-outline-primary btn-lg">
+                                        <i class="fas fa-calendar-alt me-2"></i>Etkinlikleri İncele
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Info -->
+        <section class="contact-info py-5 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="fas fa-map-marker-alt fa-2x mb-3"></i>
+                            <h5>Adres</h5>
+                            <p>{{ bar_info.address }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="fas fa-phone fa-2x mb-3"></i>
+                            <h5>Telefon</h5>
+                            <p>{{ bar_info.phone }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="fas fa-clock fa-2x mb-3"></i>
+                            <h5>Çalışma Saatleri</h5>
+                            <p>{{ bar_info.opening_hours }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %} 
