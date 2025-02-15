@@ -242,7 +242,7 @@
                                     <!-- Admin Yanıt Formu -->
                                     {% if user.is_staff and not review.responses.exists %}
                                     <div class="admin-response-form mt-3">
-                                        <form action="{% url 'add_response' review.id %}" method="post" class="add-response-form">
+                                        <form action="{% url 'add_response' review.id %}" method="post" class="add-response-form" data-review-id="{{ review.id }}">
                                             {% csrf_token %}
                                             <div class="input-group">
                                                 <input type="text" name="response_text" class="form-control" placeholder="Yanıtınızı yazın..." required>
@@ -696,194 +696,34 @@
 
 {% block extra_js %}
 <script>
-// Yıldız derecelendirme sistemi için yardımcı fonksiyonlar
-function resetStars() {
-    document.querySelectorAll('.rating-stars i').forEach(icon => {
-        icon.className = 'far fa-star';
-    });
-}
+document.addEventListener('DOMContentLoaded', function() {
+    // Değerlendirme düzenleme formu
+    document.querySelectorAll('.edit-review-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const reviewId = this.dataset.reviewId;
 
-function createRatingStars(reviewId, currentRating) {
-    const starsContainer = document.createElement('div');
-    starsContainer.className = 'rating-stars';
-    
-    for (let i = 1; i <= 5; i++) {
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'rating';
-        input.value = i;
-        input.id = `edit_star${i}_${reviewId}`;
-        if (currentRating === i) {
-            input.checked = true;
-        }
-
-        const label = document.createElement('label');
-        label.htmlFor = `edit_star${i}_${reviewId}`;
-        const icon = document.createElement('i');
-        icon.className = 'far fa-star';
-        label.appendChild(icon);
-
-        starsContainer.appendChild(input);
-        starsContainer.appendChild(label);
-    }
-    
-    return starsContainer;
-}
-
-// Değerlendirme düzenleme formunu oluştur
-function createEditForm(reviewId, rating, comment) {
-    const form = document.createElement('form');
-    form.className = 'edit-review-form';
-    form.method = 'post';
-    form.action = `/review/${reviewId}/edit/`;
-    
-    const starsContainer = createRatingStars(reviewId, parseInt(rating));
-    
-    const inputGroup = document.createElement('div');
-    inputGroup.className = 'input-group';
-    
-    const commentInput = document.createElement('input');
-    commentInput.type = 'text';
-    commentInput.name = 'comment';
-    commentInput.className = 'form-control';
-    commentInput.value = comment;
-    commentInput.required = true;
-    
-    const submitButton = document.createElement('button');
-    submitButton.type = 'submit';
-    submitButton.className = 'btn btn-primary';
-    submitButton.innerHTML = '<i class="fas fa-check"></i>';
-    
-    const cancelButton = document.createElement('button');
-    cancelButton.type = 'button';
-    cancelButton.className = 'btn btn-secondary';
-    cancelButton.onclick = () => toggleEditForm(reviewId);
-    
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrfmiddlewaretoken';
-    csrfInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    inputGroup.appendChild(commentInput);
-    inputGroup.appendChild(submitButton);
-    inputGroup.appendChild(cancelButton);
-    
-    form.appendChild(starsContainer);
-    form.appendChild(inputGroup);
-    form.appendChild(csrfInput);
-    
-    return form;
-}
-
-// Yanıt düzenleme formunu aç/kapat
-function toggleEditForm(responseId) {
-    const responseText = document.querySelector(`#response-${responseId} .response-text`);
-    const editForm = document.querySelector(`#edit-form-${responseId}`);
-    
-    if (editForm.style.display === 'none' || !editForm.style.display) {
-        editForm.style.display = 'block';
-        editForm.querySelector('textarea').value = responseText.textContent.trim();
-        responseText.style.display = 'none';
-    } else {
-        editForm.style.display = 'none';
-        responseText.style.display = 'block';
-    }
-}
-
-// Yanıt düzenleme işlemi
-document.addEventListener('click', function(e) {
-    if (e.target.matches('.edit-response-btn') || e.target.closest('.edit-response-btn')) {
-        const btn = e.target.matches('.edit-response-btn') ? e.target : e.target.closest('.edit-response-btn');
-        const responseId = btn.dataset.responseId;
-        toggleEditForm(responseId);
-    }
-});
-
-// Yanıt düzenleme formu gönderimi
-document.addEventListener('submit', function(e) {
-    if (e.target.matches('.edit-response-form')) {
-        e.preventDefault();
-        const form = e.target;
-        const responseId = form.dataset.responseId;
-        const formData = new FormData(form);
-        
-        fetch(`/response/${responseId}/edit/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                const responseElement = document.querySelector(`#response-${responseId}`);
-                const responseText = responseElement.querySelector('.response-text');
-                responseText.textContent = formData.get('response_text');
-                
-                // Düzenleme bilgisini güncelle
-                const editInfo = responseElement.querySelector('.edit-info');
-                if (editInfo) {
-                    editInfo.textContent = '(düzenlendi)';
-                }
-                
-                toggleEditForm(responseId);
-                showAlert(data.message, 'success');
-            } else {
-                showAlert(data.error || 'Bir hata oluştu', 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
-        });
-    }
-});
-
-// Yanıt silme işlemi
-document.addEventListener('click', function(e) {
-    if (e.target.matches('.delete-response-btn') || e.target.closest('.delete-response-btn')) {
-        const btn = e.target.matches('.delete-response-btn') ? e.target : e.target.closest('.delete-response-btn');
-        const responseId = btn.dataset.responseId;
-        const reviewId = btn.dataset.reviewId;
-        
-        if (confirm('Bu yanıtı silmek istediğinizden emin misiniz?')) {
-            fetch(`/response/${responseId}/delete/`, {
+            fetch(`/review/${reviewId}/edit/`, {
                 method: 'POST',
+                body: formData,
                 headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    const responseElement = document.querySelector(`#response-${responseId}`);
-                    $(responseElement).fadeOut(300, function() {
-                        this.remove();
-                        
-                        // Yanıt silindikten sonra yanıt formunu göster
-                        const reviewElement = document.querySelector(`#review-${reviewId}`);
-                        if (reviewElement) {
-                            const responseForm = document.createElement('div');
-                            responseForm.className = 'admin-response-form mt-3';
-                            responseForm.innerHTML = `
-                                <form action="/review/${reviewId}/response/" method="post" class="add-response-form">
-                                    {% csrf_token %}
-                                    <div class="input-group">
-                                        <input type="text" name="response_text" class="form-control" placeholder="Yanıtınızı yazın..." required>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-paper-plane"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            `;
-                            reviewElement.querySelector('.card-body').appendChild(responseForm);
-                        }
-                        
-                        showAlert(data.message, 'success');
-                    });
+                    // Değerlendirmeyi güncelle
+                    const reviewElement = document.querySelector(`#review-${reviewId}`);
+                    reviewElement.querySelector('.review-rating').innerHTML = '★'.repeat(data.review.rating);
+                    reviewElement.querySelector('.review-comment').textContent = data.review.comment;
+                    
+                    // Düzenleme formunu kapat
+                    reviewElement.querySelector('.edit-form-container').style.display = 'none';
+                    reviewElement.querySelector('.review-content').style.display = 'block';
+                    
+                    showAlert('Değerlendirmeniz başarıyla güncellendi.', 'success');
                 } else {
                     showAlert(data.error || 'Bir hata oluştu', 'danger');
                 }
@@ -892,11 +732,179 @@ document.addEventListener('click', function(e) {
                 console.error('Error:', error);
                 showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
             });
-        }
+        });
+    });
+
+    // Değerlendirme silme işlemi
+    document.querySelectorAll('.delete-review-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Bu değerlendirmeyi silmek istediğinizden emin misiniz?')) {
+                const reviewId = this.dataset.reviewId;
+                
+                fetch(`/review/${reviewId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Değerlendirmeyi sayfadan kaldır
+                        document.querySelector(`#review-${reviewId}`).remove();
+                        showAlert('Değerlendirmeniz başarıyla silindi.', 'success');
+                    } else {
+                        showAlert(data.error || 'Bir hata oluştu', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
+                });
+            }
+        });
+    });
+
+    // Yanıt silme işlemi
+    document.querySelectorAll('.delete-response-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Bu yanıtı silmek istediğinizden emin misiniz?')) {
+                const responseId = this.dataset.responseId;
+                const reviewId = this.dataset.reviewId;
+                
+                fetch(`/response/${responseId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Yanıtı sayfadan kaldır
+                        const responseElement = document.querySelector(`#response-${responseId}`);
+                        responseElement.remove();
+                        
+                        // Yanıt formunu tekrar göster
+                        const reviewElement = document.querySelector(`#review-${reviewId}`);
+                        const responseFormHTML = `
+                            <div class="admin-response-form mt-3">
+                                <form action="/review/${reviewId}/response/" method="post" class="add-response-form" data-review-id="${reviewId}">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        <input type="text" name="response_text" class="form-control" placeholder="Yanıtınızı yazın..." required>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        `;
+                        reviewElement.querySelector('.card-body').insertAdjacentHTML('beforeend', responseFormHTML);
+                        
+                        // Yeni eklenen form için event listener ekle
+                        initializeResponseForm(reviewElement.querySelector('.add-response-form'));
+                        
+                        showAlert('Yanıt başarıyla silindi.', 'success');
+                    } else {
+                        showAlert(data.error || 'Bir hata oluştu', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
+                });
+            }
+        });
+    });
+
+    // Yanıt formlarını initialize et
+    function initializeResponseForm(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const reviewId = this.dataset.reviewId;
+            const responseText = this.querySelector('input[name="response_text"]').value;
+            
+            fetch(`/review/${reviewId}/response/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `response_text=${encodeURIComponent(responseText)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Yanıt formunu kaldır
+                    form.parentElement.remove();
+                    
+                    // Yeni yanıtı ekle
+                    const responseHTML = `
+                        <div class="response-container mt-3" id="response-${data.response.id}">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Yanıt</h6>
+                                            <p class="mb-1">${data.response.text}</p>
+                                            <small class="text-muted">
+                                                ${data.response.responder_name} tarafından ${data.response.created_at}
+                                            </small>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <button class="dropdown-item delete-response-btn" data-response-id="${data.response.id}" data-review-id="${reviewId}">
+                                                        <i class="fas fa-trash-alt me-2"></i>Sil
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const reviewElement = document.querySelector(`#review-${reviewId}`);
+                    reviewElement.querySelector('.card-body').insertAdjacentHTML('beforeend', responseHTML);
+                    
+                    // Yeni eklenen silme butonu için event listener ekle
+                    const newDeleteBtn = reviewElement.querySelector(`#response-${data.response.id} .delete-response-btn`);
+                    if (newDeleteBtn) {
+                        newDeleteBtn.addEventListener('click', function(e) {
+                            // Silme işlemi event listener'ını tekrar ekle
+                            document.querySelectorAll('.delete-response-btn').forEach(btn => {
+                                btn.addEventListener('click', deleteResponseHandler);
+                            });
+                        });
+                    }
+                    
+                    showAlert('Yanıtınız başarıyla eklendi.', 'success');
+                } else {
+                    showAlert(data.error || 'Bir hata oluştu', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
+            });
+        });
     }
+
+    // Mevcut yanıt formlarını initialize et
+    document.querySelectorAll('.add-response-form').forEach(form => {
+        initializeResponseForm(form);
+    });
 });
 
-// Uyarı mesajı gösterme fonksiyonu
 function showAlert(message, type) {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
@@ -907,14 +915,17 @@ function showAlert(message, type) {
     
     const alertContainer = document.querySelector('.alert-container') || document.createElement('div');
     alertContainer.className = 'alert-container';
-    document.querySelector('.container').insertBefore(alertContainer, document.querySelector('.container').firstChild);
+    if (!document.body.contains(alertContainer)) {
+        document.querySelector('.menu-item-detail').prepend(alertContainer);
+    }
     
     alertContainer.appendChild(alertDiv);
     
     setTimeout(() => {
-        $(alertDiv).fadeOut(300, function() {
-            this.remove();
-        });
+        alertDiv.remove();
+        if (alertContainer.children.length === 0) {
+            alertContainer.remove();
+        }
     }, 5000);
 }
 </script>
