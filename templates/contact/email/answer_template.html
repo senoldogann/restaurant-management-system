@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site_name }} - İletişim Formu Yanıtı</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .email-header {
+            background: linear-gradient(135deg, #F39600, #E67E22);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .email-content {
+            padding: 40px 30px;
+            background: #ffffff;
+        }
+        .greeting {
+            font-size: 20px;
+            color: #2C3E50;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .message-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #F39600;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .message-label {
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .message-text {
+            color: #555;
+            margin: 0;
+            padding: 10px 0;
+            line-height: 1.8;
+        }
+        .divider {
+            border-top: 1px solid #eee;
+            margin: 30px 0;
+        }
+        .signature {
+            color: #2C3E50;
+            font-weight: 500;
+        }
+        .contact-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .contact-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .social-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .social-links a {
+            color: #F39600;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .email-footer {
+            background-color: #2C3E50;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #F39600;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-content {
+                padding: 20px 15px;
+            }
+            .email-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-header">
+            <h1>{{ site_name }}</h1>
+        </div>
+        
+        <div class="email-content">
+            <div class="greeting">
+                Sayın {{ name }},
+            </div>
+            
+            <p>İletişim formu üzerinden gönderdiğiniz mesajınız için teşekkür ederiz. Mesajınıza yanıtımız aşağıdadır:</p>
+            
+            <div class="message-box">
+                <div class="message-label">Gönderdiğiniz Mesaj:</div>
+                <div class="message-text">{{ message }}</div>
+            </div>
+            
+            <div class="message-box">
+                <div class="message-label">Yanıtımız:</div>
+                <div class="message-text">{{ answer }}</div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p class="signature">
+                Saygılarımızla,<br>
+                <strong>{{ site_name }} Ekibi</strong>
+            </p>
+            
+            <div class="contact-info">
+                <p><strong>Bize Ulaşın</strong></p>
+                <p>Telefon: +90 (212) 123 45 67</p>
+                <p>E-posta: info@foodanddrink.com</p>
+                <p>Adres: İstanbul, Türkiye</p>
+                
+                <a href="https://foodanddrink.com" class="btn">Web Sitemizi Ziyaret Edin</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#">Facebook</a> |
+                <a href="#">Instagram</a> |
+                <a href="#">Twitter</a>
+            </div>
+        </div>
+        
+        <div class="email-footer">
+            <p>© {{ site_name }} {{ "now"|date:"Y" }}. Tüm hakları saklıdır.</p>
+            <p>Bu e-posta {{ site_name }} tarafından gönderilmiştir.</p>
+        </div>
+    </div>
+</body>
+</html> 

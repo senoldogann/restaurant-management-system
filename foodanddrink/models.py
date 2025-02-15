@@ -114,4 +114,31 @@ class ReviewResponse(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f'{self.review.item_name} Değerlendirmesine Yanıt' 
+        return f'{self.review.item_name} Değerlendirmesine Yanıt'
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Ad Soyad')
+    email = models.EmailField(verbose_name='E-posta')
+    subject = models.CharField(max_length=200, verbose_name='Konu')
+    message = models.TextField(verbose_name='Mesaj')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Gönderim Tarihi')
+    is_read = models.BooleanField(default=False, verbose_name='Okundu mu?')
+    is_answered = models.BooleanField(default=False, verbose_name='Yanıtlandı mı?')
+    answer = models.TextField(blank=True, null=True, verbose_name='Yanıt')
+    answered_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='answered_messages',
+        verbose_name='Yanıtlayan'
+    )
+    answered_at = models.DateTimeField(null=True, blank=True, verbose_name='Yanıt Tarihi')
+    
+    class Meta:
+        verbose_name = 'İletişim Mesajı'
+        verbose_name_plural = 'İletişim Mesajları'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} - {self.subject}" 

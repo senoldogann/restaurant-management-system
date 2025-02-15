@@ -164,3 +164,13 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+# E-posta Ayarları
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail SMTP sunucusu
+EMAIL_PORT = 587  # Gmail SMTP portu
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'senoldogan0233@gmail.com'  # Gmail adresiniz
+EMAIL_HOST_PASSWORD = 'ugfdjmojnewmcxob'  # Gmail uygulama şifreniz
+DEFAULT_FROM_EMAIL = 'Food & Drink <senoldogan0233@gmail.com>'
+SITE_NAME = 'Food & Drink'

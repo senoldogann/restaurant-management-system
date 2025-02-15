@@ -859,6 +859,10 @@
                         <p><i class="fas fa-map-marker-alt me-2"></i>{{ bar_info.address }}</p>
                         <p><i class="fas fa-phone me-2"></i>{{ bar_info.phone }}</p>
                         <p><i class="fas fa-envelope me-2"></i>{{ bar_info.email }}</p>
+                    {% else %}
+                        <p><i class="fas fa-map-marker-alt me-2"></i>{{ restaurant_info.address }}</p>
+                        <p><i class="fas fa-phone me-2"></i>{{ restaurant_info.phone }}</p>
+                        <p><i class="fas fa-envelope me-2"></i>{{ restaurant_info.email }}</p>
                     {% endif %}
                 </div>
 
@@ -870,6 +874,7 @@
                             <li><a href="{% url 'restaurant:home' %}">Ana Sayfa</a></li>
                             <li><a href="{% url 'restaurant:menu' %}">Menü</a></li>
                             <li><a href="{% url 'restaurant:reservation' %}">Rezervasyon</a></li>
+                            <li><a href="{% url 'contact' %}">İletişim</a></li>
                         </ul>
                     {% elif request.path|slice:":4" == "/bar" %}
                         <ul class="list-unstyled">
@@ -877,6 +882,14 @@
                             <li><a href="{% url 'bar:drinks' %}">İçecekler</a></li>
                             <li><a href="{% url 'bar:events' %}">Etkinlikler</a></li>
                             <li><a href="{% url 'bar:reservation' %}">Rezervasyon</a></li>
+                            <li><a href="{% url 'contact' %}">İletişim</a></li>
+                        </ul>
+                    {% else %}
+                        <ul class="list-unstyled">
+                            <li><a href="{% url 'home' %}">Ana Sayfa</a></li>
+                            <li><a href="{% url 'restaurant:menu' %}">Restoran Menü</a></li>
+                            <li><a href="{% url 'bar:drinks' %}">Bar İçecekler</a></li>
+                            <li><a href="{% url 'contact' %}">İletişim</a></li>
                         </ul>
                     {% endif %}
                 </div>

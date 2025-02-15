@@ -177,10 +177,17 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
-                                            <h6 class="mb-1">
-                                                {{ review.user.username }}
-                                                <small class="text-muted ms-2">{{ review.created_at|date:"d.m.Y H:i" }}</small>
-                                            </h6>
+                                            <div class="d-flex align-items-center mb-2">
+                                                {% if review.user.userprofile.profile_picture %}
+                                                    <img src="{{ review.user.userprofile.profile_picture.url }}" alt="{{ review.user.get_full_name }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                {% else %}
+                                                    <i class="fas fa-user-circle me-2" style="font-size: 40px; color: #ccc;"></i>
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="mb-0">{{ review.user.get_full_name|default:review.user.username }}</h6>
+                                                    <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                                                </div>
+                                            </div>
                                             <div class="rating-display">
                                                 {% for i in "12345"|make_list %}
                                                 <i class="{% if forloop.counter <= review.rating %}fas{% else %}far{% endif %} fa-star"></i>
@@ -215,25 +222,40 @@
                                                 <span class="responder-name">{{ response.responded_by.get_full_name }}</span>
                                                 <small class="text-muted ms-2">{{ response.created_at|date:"d.m.Y" }}</small>
                                                 {% if response.is_edited %}
-                                                <small class="text-muted ms-2 edited-info">(düzenlendi: {{ response.updated_at|date:"d.m.Y" }})</small>
+                                                <small class="text-muted ms-2 edit-info">(düzenlendi: {{ response.updated_at|date:"d.m.Y" }})</small>
                                                 {% endif %}
                                             </div>
                                             {% if user.is_staff %}
                                             <div class="response-actions">
                                                 <button class="btn btn-sm btn-link edit-response-btn"
                                                         data-response-id="{{ response.id }}"
-                                                        data-response-text="{{ response.response_text }}">
+                                                        data-review-id="{{ review.id }}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <button class="btn btn-sm btn-link text-danger delete-response-btn"
-                                                        data-response-id="{{ response.id }}">
+                                                        data-response-id="{{ response.id }}"
+                                                        data-review-id="{{ review.id }}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                             {% endif %}
                                         </div>
                                         <div class="response-content">
-                                            <p>{{ response.response_text }}</p>
+                                            <p class="response-text">{{ response.response_text }}</p>
+                                        </div>
+                                        <div id="edit-form-{{ response.id }}" style="display: none;">
+                                            <form class="edit-response-form" data-response-id="{{ response.id }}">
+                                                {% csrf_token %}
+                                                <div class="input-group">
+                                                    <textarea name="response_text" class="form-control" required>{{ response.response_text }}</textarea>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" onclick="toggleEditForm('{{ response.id }}')">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                     {% endfor %}
@@ -653,266 +675,154 @@
 
 {% block extra_js %}
 <script>
-// Yanıt gönderme işlevi
-function submitResponse(event, form) {
-    event.preventDefault();
+// Yanıt düzenleme formunu aç/kapat
+function toggleEditForm(responseId) {
+    const responseText = document.querySelector(`#response-${responseId} .response-text`);
+    const editForm = document.querySelector(`#edit-form-${responseId}`);
     
-    const formData = new FormData(form);
-    
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            location.reload();
-        } else {
-            alert(data.error || 'Bir hata oluştu');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Bir hata oluştu');
-    });
-    
-    return false;
+    if (editForm.style.display === 'none' || !editForm.style.display) {
+        editForm.style.display = 'block';
+        editForm.querySelector('textarea').value = responseText.textContent.trim();
+        responseText.style.display = 'none';
+    } else {
+        editForm.style.display = 'none';
+        responseText.style.display = 'block';
+    }
 }
 
-// Yanıt düzenleme işlevi
-document.querySelectorAll('.edit-response-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const responseId = this.dataset.responseId;
-        const responseText = this.dataset.responseText;
-        const responseContent = document.querySelector(`#response-${responseId} .response-content`);
+// Yanıt düzenleme işlemi
+document.addEventListener('click', function(e) {
+    if (e.target.matches('.edit-response-btn') || e.target.closest('.edit-response-btn')) {
+        const btn = e.target.matches('.edit-response-btn') ? e.target : e.target.closest('.edit-response-btn');
+        const responseId = btn.dataset.responseId;
+        toggleEditForm(responseId);
+    }
+});
+
+// Yanıt düzenleme formu gönderimi
+document.addEventListener('submit', function(e) {
+    if (e.target.matches('.edit-response-form')) {
+        e.preventDefault();
+        const form = e.target;
+        const responseId = form.dataset.responseId;
+        const formData = new FormData(form);
         
-        const form = document.createElement('form');
-        form.className = 'edit-response-form';
-        form.innerHTML = `
-            <div class="input-group">
-                <textarea class="form-control" name="response_text" required>${responseText}</textarea>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-check"></i>
-                </button>
-                <button type="button" class="btn btn-secondary cancel-edit">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `;
-        
-        responseContent.style.display = 'none';
-        responseContent.parentNode.insertBefore(form, responseContent.nextSibling);
-        
-        form.querySelector('.cancel-edit').addEventListener('click', () => {
-            form.remove();
-            responseContent.style.display = '';
+        fetch(`/response/${responseId}/edit/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const responseElement = document.querySelector(`#response-${responseId}`);
+                const responseText = responseElement.querySelector('.response-text');
+                responseText.textContent = formData.get('response_text');
+                
+                // Düzenleme bilgisini güncelle
+                const editInfo = responseElement.querySelector('.edit-info');
+                if (editInfo) {
+                    editInfo.textContent = '(düzenlendi)';
+                } else {
+                    // Eğer edit-info elementi yoksa oluştur
+                    const responderInfo = responseElement.querySelector('.responder-info');
+                    const editInfoSpan = document.createElement('small');
+                    editInfoSpan.className = 'text-muted ms-2 edit-info';
+                    editInfoSpan.textContent = '(düzenlendi)';
+                    responderInfo.appendChild(editInfoSpan);
+                }
+                
+                toggleEditForm(responseId);
+                showAlert(data.message, 'success');
+            } else {
+                showAlert(data.error || 'Bir hata oluştu', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
         });
+    }
+});
+
+// Yanıt silme işlemi
+document.addEventListener('click', function(e) {
+    if (e.target.matches('.delete-response-btn') || e.target.closest('.delete-response-btn')) {
+        const btn = e.target.matches('.delete-response-btn') ? e.target : e.target.closest('.delete-response-btn');
+        const responseId = btn.dataset.responseId;
+        const reviewId = btn.dataset.reviewId;
         
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            fetch(`/response/${responseId}/edit/`, {
+        if (confirm('Bu yanıtı silmek istediğinizden emin misiniz?')) {
+            fetch(`/response/${responseId}/delete/`, {
                 method: 'POST',
-                body: new FormData(this),
                 headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    location.reload();
+                    const responseElement = document.querySelector(`#response-${responseId}`);
+                    $(responseElement).fadeOut(300, function() {
+                        this.remove();
+                        
+                        // Yanıt silindikten sonra yanıt formunu göster
+                        const reviewElement = document.querySelector(`#review-${reviewId}`);
+                        if (reviewElement) {
+                            const responseForm = document.createElement('div');
+                            responseForm.className = 'admin-response-form mt-3';
+                            responseForm.innerHTML = `
+                                <form action="/review/${reviewId}/response/" method="post" class="add-response-form">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        <input type="text" name="response_text" class="form-control" placeholder="Yanıtınızı yazın..." required>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            `;
+                            reviewElement.querySelector('.card-body').appendChild(responseForm);
+                        }
+                        
+                        showAlert(data.message, 'success');
+                    });
                 } else {
-                    alert(data.error || 'Bir hata oluştu');
+                    showAlert(data.error || 'Bir hata oluştu', 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Bir hata oluştu');
-            });
-        });
-    });
-});
-
-// Yanıt silme işlevi
-document.querySelectorAll('.delete-response-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        if (confirm('Bu yanıtı silmek istediğinizden emin misiniz?')) {
-            const responseId = this.dataset.responseId;
-            
-            fetch(`/response/${responseId}/delete/`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    location.reload();
-                } else {
-                    alert(data.error || 'Bir hata oluştu');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Bir hata oluştu');
+                showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
             });
         }
-    });
-});
-
-// Yıldız derecelendirme sistemi
-document.querySelectorAll('.rating-stars input').forEach(input => {
-    input.addEventListener('change', function() {
-        const rating = this.value;
-        const stars = this.closest('.rating-stars').querySelectorAll('label i');
-        
-        stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.remove('far');
-                star.classList.add('fas');
-            } else {
-                star.classList.remove('fas');
-                star.classList.add('far');
-            }
-        });
-    });
-});
-
-// Değerlendirme silme işlevi
-document.querySelectorAll('.delete-review-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        if (confirm('Bu değerlendirmeyi silmek istediğinizden emin misiniz?')) {
-            const reviewId = this.dataset.reviewId;
-            
-            fetch(`/review/${reviewId}/delete/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-            });
-        }
-    });
-});
-
-// Değerlendirme düzenleme işlevi
-document.querySelectorAll('.edit-review-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const reviewId = this.dataset.reviewId;
-        const rating = this.dataset.rating;
-        const comment = this.dataset.comment;
-        const reviewItem = this.closest('.review-item');
-        
-        // Düzenleme formunu oluştur
-        const form = document.createElement('form');
-        form.className = 'edit-review-form mt-2';
-        form.innerHTML = `
-            <div class="rating-input mb-2">
-                <div class="rating-stars">
-                    {% for i in "12345"|make_list %}
-                    <input type="radio" name="rating" value="{{ forloop.counter }}" id="edit_star{{ forloop.counter }}_${reviewId}" ${forloop.counter == rating ? 'checked' : ''}>
-                    <label for="edit_star{{ forloop.counter }}_${reviewId}"><i class="far fa-star"></i></label>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="input-group">
-                <input type="text" name="comment" class="form-control" value="${comment}" required>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-check"></i>
-                </button>
-                <button type="button" class="btn btn-secondary cancel-edit">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `;
-        
-        // Mevcut içeriği gizle ve formu ekle
-        const reviewContent = reviewItem.querySelector('p');
-        reviewContent.style.display = 'none';
-        reviewContent.after(form);
-        
-        // Yıldız derecelendirme sistemini etkinleştir
-        const stars = form.querySelectorAll('.rating-stars input');
-        stars.forEach(input => {
-            input.addEventListener('change', function() {
-                const labels = form.querySelectorAll('.rating-stars label i');
-                labels.forEach((star, index) => {
-                    if (index < this.value) {
-                        star.classList.remove('far');
-                        star.classList.add('fas');
-                    } else {
-                        star.classList.remove('fas');
-                        star.classList.add('far');
-                    }
-                });
-            });
-        });
-        
-        // İptal butonunu etkinleştir
-        form.querySelector('.cancel-edit').addEventListener('click', () => {
-            form.remove();
-            reviewContent.style.display = '';
-        });
-        
-        // Form gönderimini işle
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            fetch(`/review/${reviewId}/edit/`, {
-                method: 'POST',
-                body: new FormData(this),
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-            });
-        });
-        
-        // Başlangıçta yıldızları ayarla
-        const ratingInput = form.querySelector(`input[value="${rating}"]`);
-        if (ratingInput) {
-            ratingInput.dispatchEvent(new Event('change'));
-        }
-    });
-});
-
-function toggleEditForm(responseId) {
-    const contentDiv = document.getElementById(`response-content-${responseId}`);
-    const editForm = document.getElementById(`edit-form-${responseId}`);
-    
-    if (contentDiv.style.display !== 'none') {
-        contentDiv.style.display = 'none';
-        editForm.classList.remove('d-none');
-    } else {
-        contentDiv.style.display = 'block';
-        editForm.classList.add('d-none');
     }
+});
+
+// Uyarı mesajı gösterme fonksiyonu
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    const alertContainer = document.querySelector('.alert-container') || document.createElement('div');
+    alertContainer.className = 'alert-container';
+    document.querySelector('.container').insertBefore(alertContainer, document.querySelector('.container').firstChild);
+    
+    alertContainer.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        $(alertDiv).fadeOut(300, function() {
+            this.remove();
+        });
+    }, 5000);
 }
 </script>
 {% endblock %} 

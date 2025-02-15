@@ -1,298 +1,554 @@
-{% extends 'base.html' %}
-{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - {{ user.get_full_name|default:user.username }}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #F39600;
+            --secondary-color: #2C3E50;
+        }
 
-{% block title %}Profil - {{ user.get_full_name }}{% endblock %}
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
 
-{% block header %}{% endblock %}
-{% block footer %}{% endblock %}
+        .profile-page {
+            padding: 2rem 0;
+            min-height: 100vh;
+        }
 
-{% block content %}
-<div class="profile-page">
-    <div class="container py-5 mt-4">
-        <!-- Geri Dönüş Butonları -->
-        <div class="navigation-buttons mb-4">
-            <a href="{% url 'restaurant:home' %}" class="btn btn-outline-primary me-2">
-                <i class="fas fa-utensils me-2"></i>Restorana Dön
-            </a>
-            <a href="{% url 'bar:home' %}" class="btn btn-outline-primary">
-                <i class="fas fa-glass-martini-alt me-2"></i>Bara Dön
-            </a>
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color), #E67E22);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .default-avatar {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-email {
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .profile-body {
+            padding: 2rem;
+        }
+
+        .profile-form .form-control {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .reviews-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+        }
+
+        .reviews-title {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .review-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .review-info h5 {
+            margin: 0;
+            color: var(--secondary-color);
+        }
+
+        .review-rating {
+            color: #ffc107;
+        }
+
+        .review-comment {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .no-reviews i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .no-reviews p {
+            margin: 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #E67E22;
+            border-color: #E67E22;
+        }
+
+        .navigation-buttons {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .navigation-buttons .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navigation-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .profile-card {
+                margin-bottom: 2rem;
+            }
+
+            .navigation-buttons {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        .alert {
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    {% if messages %}
+    <div class="message-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 1000; margin-top: 1rem;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-        <div class="row">
-            <!-- Profil Bilgileri -->
-            <div class="col-lg-4 mb-4">
-                <div class="profile-card">
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            {% if user.userprofile.profile_picture %}
-                                <img src="{{ user.userprofile.profile_picture.url }}" alt="{{ user.get_full_name }}" class="profile-image">
-                            {% else %}
-                                <div class="profile-image-placeholder">
-                                    <i class="fas fa-user"></i>
+    <div class="profile-page">
+        <div class="container">
+            <div class="row">
+                <!-- Profil Bilgileri -->
+                <div class="col-lg-4 mb-4">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                {% if user.userprofile.profile_picture %}
+                                    <img src="{{ user.userprofile.profile_picture.url }}" alt="Profil" class="profile-img">
+                                {% else %}
+                                    <div class="default-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <h3 class="profile-name">{{ user.get_full_name|default:user.username }}</h3>
+                            <p class="profile-email">{{ user.email }}</p>
+                        </div>
+                        <div class="profile-body">
+                            <form method="post" enctype="multipart/form-data" class="profile-form">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label">Profil Fotoğrafı</label>
+                                    <input type="file" name="profile_picture" class="form-control" accept="image/*">
                                 </div>
-                            {% endif %}
+                                <div class="mb-3">
+                                    <label class="form-label">Ad</label>
+                                    <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Soyad</label>
+                                    <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Telefon</label>
+                                    <input type="tel" name="phone_number" class="form-control" value="{{ user.userprofile.phone_number|default:'' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Hakkımda</label>
+                                    <textarea name="bio" class="form-control" rows="4">{{ user.userprofile.bio }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                                </button>
+                            </form>
                         </div>
-                        <h2 class="profile-name">{{ user.get_full_name }}</h2>
-                        <p class="profile-username">@{{ user.username }}</p>
-                    </div>
-                    <div class="profile-info">
-                        <div class="info-item">
-                            <i class="fas fa-envelope"></i>
-                            <span>{{ user.email }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-phone"></i>
-                            <span>{{ user.userprofile.phone_number|default:"Telefon numarası eklenmemiş" }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>Üyelik: {{ user.date_joined|date:"d.m.Y" }}</span>
-                        </div>
-                    </div>
-                    <div class="profile-bio">
-                        <h5>Hakkımda</h5>
-                        <p>{{ user.userprofile.bio|default:"Henüz bir biyografi eklenmemiş." }}</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Değerlendirmeler -->
-            <div class="col-lg-8">
-                <div class="reviews-card">
-                    <div class="reviews-header">
-                        <h3><i class="fas fa-star me-2"></i>Değerlendirmelerim</h3>
-                    </div>
-                    <div class="reviews-list">
-                        {% if reviews %}
-                            {% for review in reviews %}
-                            <div class="review-item">
-                                <div class="review-header">
-                                    <div class="review-location">
-                                        <i class="fas {% if review.location == 'restaurant' %}fa-utensils{% else %}fa-glass-martini-alt{% endif %} me-2"></i>
-                                        {{ review.location|title }}
-                                    </div>
-                                    <div class="review-date">{{ review.created_at|date:"d.m.Y" }}</div>
-                                </div>
-                                <div class="review-content">
-                                    <h5 class="review-item-name">{{ review.item_name }}</h5>
-                                    <div class="review-rating">
-                                        {% for i in "12345"|make_list %}
-                                            {% if forloop.counter <= review.rating %}
-                                                <i class="fas fa-star text-warning"></i>
-                                            {% else %}
-                                                <i class="far fa-star text-warning"></i>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                    <p class="review-comment">{{ review.comment }}</p>
-                                </div>
+                <!-- Değerlendirmeler -->
+                <div class="col-lg-8">
+                    {% if user.is_staff %}
+                        <!-- Admin Yanıtları -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-comments me-2"></i>Yanıtlarım
+                                </h5>
                             </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="no-reviews">
-                                <i class="fas fa-comment-slash"></i>
-                                <p>Henüz bir değerlendirme yapmadınız.</p>
+                            <div class="card-body">
+                                {% if responses %}
+                                    {% for response in responses %}
+                                    <div class="response-item mb-3 pb-3 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="text-muted small mb-1">
+                                                    {{ response.review.item_name }} için yapılan değerlendirmeye yanıt
+                                                </div>
+                                                <p class="mb-1">{{ response.response_text }}</p>
+                                                <div class="text-muted small">
+                                                    {{ response.created_at|date:"d.m.Y H:i" }}
+                                                    {% if response.is_edited %}
+                                                        <span class="ms-2">(düzenlendi: {{ response.updated_at|date:"d.m.Y H:i" }})</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="response-actions">
+                                                <button class="btn btn-sm btn-link text-primary edit-response-btn"
+                                                        data-response-id="{{ response.id }}"
+                                                        data-response-text="{{ response.response_text }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-link text-danger delete-response-btn"
+                                                        data-response-id="{{ response.id }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="original-review mt-2 ps-3 border-start">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <div class="rating-display me-2">
+                                                    {% for i in "12345"|make_list %}
+                                                    <i class="{% if forloop.counter <= response.review.rating %}fas{% else %}far{% endif %} fa-star"></i>
+                                                    {% endfor %}
+                                                </div>
+                                                <small class="text-muted">{{ response.review.user.get_full_name|default:response.review.user.username }}</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">{{ response.review.comment }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-comment-slash fa-2x mb-2"></i>
+                                        <p class="mb-0">Henüz hiç yanıt vermemişsiniz.</p>
+                                    </div>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% else %}
+                        <!-- Normal Kullanıcı Değerlendirmeleri -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-star me-2"></i>Değerlendirmelerim
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {% if reviews %}
+                                    {% for review in reviews %}
+                                    <div class="review-item mb-3 pb-3 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">{{ review.item_name }}</h6>
+                                                <div class="rating-display mb-2">
+                                                    {% for i in "12345"|make_list %}
+                                                    <i class="{% if forloop.counter <= review.rating %}fas{% else %}far{% endif %} fa-star"></i>
+                                                    {% endfor %}
+                                                </div>
+                                                <p class="mb-1">{{ review.comment }}</p>
+                                                <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                                            </div>
+                                            <div class="review-actions">
+                                                <button class="btn btn-sm btn-link text-primary edit-review-btn"
+                                                        data-review-id="{{ review.id }}"
+                                                        data-rating="{{ review.rating }}"
+                                                        data-comment="{{ review.comment }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-link text-danger delete-review-btn"
+                                                        data-review-id="{{ review.id }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {% if review.responses.exists %}
+                                        <div class="admin-responses mt-2">
+                                            {% for response in review.responses.all %}
+                                            <div class="admin-response">
+                                                <div class="response-header">
+                                                    <div class="responder-info">
+                                                        <i class="fas fa-user-shield me-2"></i>
+                                                        <span class="responder-name">{{ response.responded_by.get_full_name }}</span>
+                                                        <small class="text-muted ms-2">{{ response.created_at|date:"d.m.Y" }}</small>
+                                                    </div>
+                                                </div>
+                                                <div class="response-content">
+                                                    <p>{{ response.response_text }}</p>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-star-half-alt fa-2x mb-2"></i>
+                                        <p class="mb-0">Henüz değerlendirme yapmamışsınız.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
 
-{% block extra_css %}
-<style>
-    body {
-        background-color: #f8f9fa;
-        padding-top: 0 !important; /* Header padding'ini kaldır */
-    }
+    <!-- Navigasyon Butonları -->
+    <div class="navigation-buttons">
+        <a href="{% url 'restaurant:home' %}" class="btn btn-light">
+            <i class="fas fa-utensils me-2"></i>Restorana Git
+        </a>
+        <a href="{% url 'bar:home' %}" class="btn btn-light">
+            <i class="fas fa-glass-martini-alt me-2"></i>Bar'a Git
+        </a>
+    </div>
 
-    .profile-page {
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Profil fotoğrafı önizleme
+        document.querySelector('input[name="profile_picture"]').addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const profileImg = document.querySelector('.profile-img');
+                    if (profileImg) {
+                        profileImg.src = e.target.result;
+                    } else {
+                        const defaultAvatar = document.querySelector('.default-avatar');
+                        if (defaultAvatar) {
+                            defaultAvatar.innerHTML = `<img src="${e.target.result}" class="profile-img">`;
+                        }
+                    }
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
 
-    .navigation-buttons {
-        display: flex;
-        gap: 1rem;
-    }
+        // Mesajları otomatik kapat
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 3000);
+        });
+    </script>
+    
+    <script>
+        // Değerlendirme silme işlemi
+        document.querySelectorAll('.delete-review').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Bu değerlendirmeyi silmek istediğinizden emin misiniz?')) {
+                    const reviewId = this.dataset.reviewId;
+                    fetch(`/review/${reviewId}/delete/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                        }
+                    });
+                }
+            });
+        });
 
-    .navigation-buttons .btn {
-        padding: 0.8rem 1.5rem;
-        font-weight: 500;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
+        // Değerlendirme düzenleme işlemi
+        document.querySelectorAll('.edit-review').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const reviewId = this.dataset.reviewId;
+                const reviewItem = this.closest('.review-item');
+                const currentRating = reviewItem.querySelector('.review-rating').querySelectorAll('.fas.fa-star').length;
+                const currentComment = reviewItem.querySelector('.review-comment').textContent;
 
-    .navigation-buttons .btn:hover {
-        transform: translateY(-2px);
-    }
+                // Düzenleme formunu oluştur
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/review/${reviewId}/edit/`;
+                form.innerHTML = `
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Puan</label>
+                        <div class="rating-stars">
+                            {% for i in "12345"|make_list %}
+                            <input type="radio" name="rating" value="{{ forloop.counter }}" id="edit_star{{ forloop.counter }}_${reviewId}"${currentRating == {{ forloop.counter }} ? ' checked' : ''}>
+                            <label for="edit_star{{ forloop.counter }}_${reviewId}"><i class="far fa-star"></i></label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Yorum</label>
+                        <textarea name="comment" class="form-control" required>${currentComment}</textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Kaydet
+                        </button>
+                        <button type="button" class="btn btn-secondary cancel-edit">
+                            <i class="fas fa-times me-1"></i>İptal
+                        </button>
+                    </div>
+                `;
 
-    .profile-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
+                // Mevcut içeriği gizle ve formu ekle
+                const content = reviewItem.querySelector('.review-header').nextElementSibling;
+                content.style.display = 'none';
+                content.insertAdjacentElement('afterend', form);
 
-    .profile-header {
-        background: linear-gradient(135deg, var(--primary-color), #E67E22);
-        padding: 2rem;
-        text-align: center;
-        color: white;
-    }
+                // İptal butonuna tıklandığında
+                form.querySelector('.cancel-edit').addEventListener('click', () => {
+                    form.remove();
+                    content.style.display = 'block';
+                });
 
-    .profile-avatar {
-        margin-bottom: 1.5rem;
-    }
+                // Form gönderildiğinde
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: new FormData(this),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 
-    .profile-image,
-    .profile-image-placeholder {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        margin: 0 auto;
-        border: 4px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .profile-image-placeholder {
-        background: rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    .profile-name {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .profile-username {
-        font-size: 1rem;
-        opacity: 0.9;
-    }
-
-    .profile-info {
-        padding: 1.5rem;
-        border-bottom: 1px solid #eee;
-    }
-
-    .info-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.8rem;
-        color: #6c757d;
-    }
-
-    .info-item i {
-        width: 24px;
-        margin-right: 10px;
-        color: var(--primary-color);
-    }
-
-    .profile-bio {
-        padding: 1.5rem;
-    }
-
-    .profile-bio h5 {
-        color: var(--secondary-color);
-        margin-bottom: 1rem;
-        font-weight: 600;
-    }
-
-    .reviews-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-
-    .reviews-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid #eee;
-    }
-
-    .reviews-header h3 {
-        margin: 0;
-        color: var(--secondary-color);
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-    }
-
-    .reviews-list {
-        padding: 1.5rem;
-    }
-
-    .review-item {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.2rem;
-        margin-bottom: 1rem;
-    }
-
-    .review-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-
-    .review-location {
-        color: var(--primary-color);
-        font-weight: 500;
-    }
-
-    .review-date {
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .review-item-name {
-        font-weight: 600;
-        color: var(--secondary-color);
-        margin-bottom: 0.5rem;
-    }
-
-    .review-rating {
-        margin-bottom: 0.8rem;
-    }
-
-    .review-comment {
-        color: #6c757d;
-        margin: 0;
-    }
-
-    .no-reviews {
-        text-align: center;
-        padding: 3rem;
-        color: #6c757d;
-    }
-
-    .no-reviews i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-
-    @media (max-width: 768px) {
-        .profile-card {
-            margin-bottom: 2rem;
-        }
-
-        .navigation-buttons {
-            flex-direction: column;
-        }
-
-        .navigation-buttons .btn {
-            width: 100%;
+    {% block extra_js %}
+    <script>
+    // Yanıt düzenleme formunu aç/kapat
+    function toggleEditForm(responseId) {
+        const responseText = document.querySelector(`#response-${responseId} .response-text`);
+        const editForm = document.querySelector(`#edit-form-${responseId}`);
+        
+        if (editForm.style.display === 'none' || !editForm.style.display) {
+            responseText.style.display = 'none';
+            editForm.style.display = 'block';
+        } else {
+            responseText.style.display = 'block';
+            editForm.style.display = 'none';
         }
     }
-</style>
-{% endblock %} 
+
+    // Yanıt düzenleme
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.edit-response-btn') || e.target.closest('.edit-response-btn')) {
+</body>
+</html> 

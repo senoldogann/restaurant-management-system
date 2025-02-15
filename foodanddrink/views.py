@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import HomePageSettings, Review, ReviewResponse, UserProfile
+from .models import HomePageSettings, Review, ReviewResponse, UserProfile, ContactMessage
 from restaurant.models import RestaurantInfo
 from bar.models import BarInfo
 from restaurant.models import MenuItem
@@ -95,7 +95,11 @@ def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
+            if not request.POST.get('terms'):
+                messages.error(request, 'Kullanım koşulları ve gizlilik politikasını kabul etmelisiniz.')
+                return render(request, 'registration/register.html', {'form': form})
             user = form.save()
+            request.session['registration_success'] = True
             messages.success(request, 'Hesabınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.')
             return redirect('login')
     else:
@@ -105,20 +109,44 @@ def register(request):
 @login_required
 def profile(request):
     if request.method == 'POST':
-        # Profil güncelleme işlemleri
-        profile = request.user.userprofile
+        user = request.user
+        profile = user.userprofile
+
+        # Kullanıcı bilgilerini güncelle
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.save()
+
+        # Profil bilgilerini güncelle
+        profile.phone_number = request.POST.get('phone_number', '')
         profile.bio = request.POST.get('bio', '')
+
+        # Profil fotoğrafını güncelle
         if 'profile_picture' in request.FILES:
             profile.profile_picture = request.FILES['profile_picture']
+        
         profile.save()
-        messages.success(request, 'Profiliniz güncellendi!')
+        messages.success(request, 'Profiliniz başarıyla güncellendi!')
         return redirect('profile')
     
-    reviews = Review.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'profile.html', {
-        'user': request.user,
-        'reviews': reviews
-    })
+    context = {
+        'user': request.user
+    }
+
+    # Admin kullanıcıları için yanıtları getir
+    if request.user.is_staff:
+        responses = ReviewResponse.objects.filter(
+            responded_by=request.user
+        ).select_related('review', 'review__user').order_by('-created_at')
+        context['responses'] = responses
+    else:
+        # Normal kullanıcılar için değerlendirmeleri getir
+        reviews = Review.objects.filter(
+            user=request.user
+        ).order_by('-created_at')
+        context['reviews'] = reviews
+    
+    return render(request, 'profile.html', context)
 
 @login_required
 def add_review(request, item_id=None):
@@ -338,16 +366,45 @@ def edit_review(request, review_id):
 
 class CustomLoginView(LoginView):
     def form_valid(self, form):
+        remember_me = self.request.POST.get('remember_me')
+        if not remember_me:
+            self.request.session.set_expiry(0)
+            self.request.session.modified = True
+            
         response = super().form_valid(form)
-        self.request.session['just_logged_in'] = True  # Oturum değişkeni ayarla
-        return response 
+        if self.request.session.pop('registration_success', False):
+            messages.success(self.request, 'Hesabınız başarıyla oluşturuldu! Hoş geldiniz.')
+        else:
+            messages.success(self.request, f'Hoş geldiniz, {self.request.user.get_full_name() or self.request.user.username}!')
+        self.request.session['just_logged_in'] = True
+        return response
+
+def get_restaurant_info():
+    return RestaurantInfo.objects.first()
 
 def contact(request):
     restaurant_info = RestaurantInfo.objects.first()
     bar_info = BarInfo.objects.first()
     
-    context = {
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        if name and email and subject and message:
+            ContactMessage.objects.create(
+                name=name,
+                email=email,
+                subject=subject,
+                message=message
+            )
+            messages.success(request, 'Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.')
+            return redirect('contact')
+        else:
+            messages.error(request, 'Lütfen tüm alanları doldurun.')
+    
+    return render(request, 'contact.html', {
         'restaurant_info': restaurant_info,
-        'bar_info': bar_info,
-    }
-    return render(request, 'contact.html', context) 
+        'bar_info': bar_info
+    }) 
