@@ -1,15 +1,15 @@
 from django import forms
-from .models import Reservation, Drink
+from .models import Event, Reservation
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column
 
 class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
-        fields = ['name', 'email', 'phone', 'date', 'time', 'guests', 'event', 'notes']
+        fields = ['name', 'email', 'phone', 'date', 'time', 'guests', 'notes']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'time': forms.TimeInput(attrs={'type': 'time'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -32,53 +32,24 @@ class ReservationForm(forms.ModelForm):
                 Column('time', css_class='form-group col-md-6'),
                 css_class='form-row'
             ),
-            'event',
             'notes',
             Submit('submit', 'Rezervasyon Yap', css_class='btn btn-primary btn-lg mt-4')
         )
-        
-        # Sadece aktif etkinlikleri göster
-        self.fields['event'].queryset = self.fields['event'].queryset.filter(is_active=True)
 
-class ReviewForm(forms.Form):
-    drink = forms.ModelChoiceField(
-        queryset=None,
-        empty_label="İçecek seçin...",
-        widget=forms.Select(attrs={
-            'class': 'form-select',
-            'required': True,
-        }),
-        label='İçecek'
-    )
-    rating = forms.IntegerField(
-        min_value=1,
-        max_value=5,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'required': True,
-            'placeholder': '1-5 arası bir puan verin'
-        }),
-        label='Puan'
-    )
-    comment = forms.CharField(
-        widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'rows': 4,
-            'required': True,
-            'placeholder': 'Deneyiminizi paylaşın...'
-        }),
-        label='Yorum'
-    )
+class EventReservationForm(forms.ModelForm):
+    class Meta:
+        model = Reservation
+        fields = ['name', 'email', 'phone', 'event', 'guests', 'notes']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'event': forms.Select(attrs={'class': 'form-control'}),
+            'guests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['drink'].queryset = Drink.objects.filter(is_available=True).order_by('name')
-        
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            'drink',
-            'rating',
-            'comment',
-            Submit('submit', 'Değerlendirmeyi Gönder', css_class='btn btn-primary')
-        ) 
+        # Sadece aktif etkinlikleri göster
+        self.fields['event'].queryset = Event.objects.filter(is_active=True) 

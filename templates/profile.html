@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -9,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
     
     <style>
         :root {
@@ -309,6 +312,75 @@
                 max-height: 400px;
             }
         }
+
+        .table th {
+            font-weight: 600;
+            color: #2C3E50;
+        }
+        
+        .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .modal-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--secondary-color);
+            border: none;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            border: none;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border: none;
+            border-bottom: 2px solid var(--primary-color);
+            background: transparent;
+        }
+
+        .tab-content {
+            padding-top: 1.5rem;
+        }
+
+        .card-header-tabs {
+            margin: 0;
+        }
+
+        .tab-pane {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -342,190 +414,165 @@
                             </div>
                             <h3 class="profile-name">{{ user.get_full_name|default:user.username }}</h3>
                             <p class="profile-email">{{ user.email }}</p>
+                            <p class="profile-phone">{{ user.userprofile.phone_number|default:'' }}</p>
+                            <p class="profile-bio">{{ user.userprofile.bio }}</p>
                         </div>
                         <div class="profile-body">
-                            <form method="post" enctype="multipart/form-data" class="profile-form">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <label class="form-label">Profil Fotoğrafı</label>
-                                    <input type="file" name="profile_picture" class="form-control" accept="image/*">
+                            <!-- Profil Düzenleme Modalı -->
+                            <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editProfileModalLabel">Profili Düzenle</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="editProfileForm" method="POST" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <div class="mb-3">
+                                                    <label for="profile_picture" class="form-label">Profil Fotoğrafı</label>
+                                                    <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="first_name" class="form-label">Ad</label>
+                                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="last_name" class="form-label">Soyad</label>
+                                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="phone" class="form-label">Telefon</label>
+                                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.userprofile.phone_number|default:'' }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="bio" class="form-label">Hakkımda</label>
+                                                    <textarea class="form-control" id="bio" name="bio" rows="3">{{ user.userprofile.bio }}</textarea>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                            <button type="submit" form="editProfileForm" class="btn btn-primary">Kaydet</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Ad</label>
-                                    <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Soyad</label>
-                                    <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Telefon</label>
-                                    <input type="tel" name="phone_number" class="form-control" value="{{ user.userprofile.phone_number|default:'' }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Hakkımda</label>
-                                    <textarea name="bio" class="form-control" rows="4">{{ user.userprofile.bio }}</textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
-                                </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Değerlendirmeler -->
+                <!-- Değerlendirmeler ve Sipariş Geçmişi -->
                 <div class="col-lg-8">
-                    {% if user.is_staff %}
-                        <!-- Admin Yanıtları -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-light">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-comments me-2"></i>Yanıtlarım
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                {% if responses %}
-                                    {% for response in responses %}
-                                    <div class="response-item mb-3 pb-3 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <div class="text-muted small mb-1">
-                                                    {{ response.review.item_name }} için yapılan değerlendirmeye yanıt
-                                                </div>
-                                                <div class="response-text">{{ response.response_text }}</div>
-                                                <div class="text-muted small">
-                                                    {{ response.created_at|date:"d.m.Y H:i" }}
-                                                    {% if response.is_edited %}
-                                                        <span class="ms-2">(düzenlendi: {{ response.updated_at|date:"d.m.Y H:i" }})</span>
-                                                    {% endif %}
-                                                </div>
-                                                {% if response.review.location == 'restaurant' and response.review.menu_item and response.review.menu_item.slug %}
-                                                    <a href="{% url 'restaurant:menu_item_detail' slug=response.review.menu_item.slug %}#review-{{ response.review.id }}" class="btn btn-sm btn-outline-primary mt-2">
-                                                        <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
-                                                    </a>
-                                                {% elif response.review.location == 'bar' and response.review.drink and response.review.drink.slug %}
-                                                    <a href="{% url 'bar:drink_detail' slug=response.review.drink.slug %}#review-{{ response.review.id }}" class="btn btn-sm btn-outline-primary mt-2">
-                                                        <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                            <div class="response-actions">
-                                                <button class="btn btn-sm btn-link text-primary edit-response-btn"
-                                                        data-response-id="{{ response.id }}"
-                                                        data-response-text="{{ response.response_text }}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-link text-danger delete-response-btn"
-                                                        data-response-id="{{ response.id }}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="original-review mt-2 ps-3 border-start">
-                                            <div class="d-flex align-items-center mb-1">
-                                                <div class="rating-display me-2">
-                                                    {% for i in "12345"|make_list %}
-                                                    <i class="{% if forloop.counter <= response.review.rating %}fas{% else %}far{% endif %} fa-star"></i>
-                                                    {% endfor %}
-                                                </div>
-                                                <small class="text-muted">{{ response.review.user.get_full_name|default:response.review.user.username }}</small>
-                                            </div>
-                                            <p class="mb-0 text-muted small">{{ response.review.comment }}</p>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="text-center text-muted py-4">
-                                        <i class="fas fa-comment-slash fa-2x mb-2"></i>
-                                        <p class="mb-0">Henüz hiç yanıt vermemişsiniz.</p>
-                                    </div>
-                                {% endif %}
-                            </div>
+                    <!-- Tab Menü -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab">
+                                        <i class="fas fa-user me-2"></i>Profil Bilgileri
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab">
+                                        <i class="fas fa-shopping-bag me-2"></i>Sipariş Geçmişim
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-                    {% else %}
-                        <!-- Normal Kullanıcı Değerlendirmeleri -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-light">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-star me-2"></i>Değerlendirmelerim
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                {% if reviews %}
-                                    {% for review in reviews %}
-                                    <div class="review-item mb-3 pb-3 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <h6 class="mb-1">{{ review.item_name }}</h6>
-                                                <div class="rating-display mb-2">
-                                                    {% for i in "12345"|make_list %}
-                                                    <i class="{% if forloop.counter <= review.rating %}fas{% else %}far{% endif %} fa-star"></i>
-                                                    {% endfor %}
-                                                </div>
-                                                <p class="mb-1">{{ review.comment }}</p>
-                                                <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
-                                                {% if review.location == 'restaurant' and review.menu_item and review.menu_item.slug %}
-                                                    <a href="{% url 'restaurant:menu_item_detail' slug=review.menu_item.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2 d-block">
-                                                        <i class="fas fa-external-link-alt me-1"></i>Değerlendirmeye Git
-                                                    </a>
-                                                {% elif review.location == 'bar' and review.drink and review.drink.slug %}
-                                                    <a href="{% url 'bar:drink_detail' slug=review.drink.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2 d-block">
-                                                        <i class="fas fa-external-link-alt me-1"></i>Değerlendirmeye Git
-                                                    </a>
-                                                {% endif %}
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <!-- Profil Bilgileri -->
+                                <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                                    <form id="profile_form" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="first_name" class="form-label">Ad</label>
+                                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
                                             </div>
-                                            <div class="review-actions">
-                                                <button class="btn btn-sm btn-link text-primary edit-review-btn"
-                                                        data-review-id="{{ review.id }}"
-                                                        data-rating="{{ review.rating }}"
-                                                        data-comment="{{ review.comment }}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-link text-danger delete-review-btn"
-                                                        data-review-id="{{ review.id }}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="last_name" class="form-label">Soyad</label>
+                                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
                                             </div>
                                         </div>
-                                        {% if review.responses.exists %}
-                                        <div class="admin-responses mt-2">
-                                            {% for response in review.responses.all %}
-                                            <div class="admin-response">
-                                                <div class="response-header">
-                                                    <div class="responder-info">
-                                                        <i class="fas fa-user-shield me-2"></i>
-                                                        <span class="responder-name">{{ response.responded_by.get_full_name }}</span>
-                                                        <small class="text-muted ms-2">{{ response.created_at|date:"d.m.Y" }}</small>
-                                                    </div>
-                                                </div>
-                                                <div class="response-content">
-                                                    <p>{{ response.response_text }}</p>
-                                                    {% if review.location == 'restaurant' and review.menu_item and review.menu_item.slug %}
-                                                        <a href="{% url 'restaurant:menu_item_detail' slug=review.menu_item.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2">
-                                                            <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
-                                                        </a>
-                                                    {% elif review.location == 'bar' and review.drink and review.drink.slug %}
-                                                        <a href="{% url 'bar:drink_detail' slug=review.drink.slug %}#review-{{ review.id }}" class="btn btn-sm btn-outline-primary mt-2">
-                                                            <i class="fas fa-external-link-alt me-1"></i>Yanıta Git
-                                                        </a>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            {% endfor %}
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">E-posta</label>
+                                            <input type="email" class="form-control" id="email" value="{{ user.email }}" readonly>
                                         </div>
+                                        <div class="mb-3">
+                                            <label for="phone_number" class="form-label">Telefon Numarası</label>
+                                            <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ user.userprofile.phone_number }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="bio" class="form-label">Hakkımda</label>
+                                            <textarea class="form-control" id="bio" name="bio" rows="3">{{ user.userprofile.bio }}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profile_picture" class="form-label">Profil Fotoğrafı</label>
+                                            <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*">
+                                            {% if user.userprofile.profile_picture %}
+                                                <img src="{{ user.userprofile.profile_picture.url }}" alt="Mevcut profil fotoğrafı" id="current_profile_picture" class="mt-2" style="max-width: 200px;">
+                                            {% endif %}
+                                            <img id="profile_picture_preview" class="mt-2" style="max-width: 200px; display: none;">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Sipariş Geçmişi -->
+                                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                    <div class="order-history-section">
+                                        {% if orders %}
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sipariş No</th>
+                                                            <th>Tarih</th>
+                                                            <th>Tutar (KDV Dahil)</th>
+                                                            <th>Durum</th>
+                                                            <th>İşlemler</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for order in orders %}
+                                                            <tr>
+                                                                <td>#{{ order.order_number }}</td>
+                                                                <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                                                                <td>{{ order.total_amount }} €</td>
+                                                                <td>
+                                                                    <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                                        {{ order.get_status_display }}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="{% url 'invoice' order.order_number %}" class="btn btn-sm btn-primary" target="_blank">
+                                                                        <i class="fas fa-file-invoice me-1"></i>Fatura
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% else %}
+                                            <div class="text-center py-5">
+                                                <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted mb-0">Henüz siparişiniz bulunmuyor</h5>
+                                                <p class="mt-2">Hemen alışverişe başlayın!</p>
+                                                <a href="{% url 'restaurant:menu' %}" class="btn btn-primary mt-3">
+                                                    <i class="fas fa-utensils me-2"></i>Menüye Git
+                                                </a>
+                                            </div>
                                         {% endif %}
                                     </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="text-center text-muted py-4">
-                                        <i class="fas fa-star-half-alt fa-2x mb-2"></i>
-                                        <p class="mb-0">Henüz değerlendirme yapmamışsınız.</p>
-                                    </div>
-                                {% endif %}
+                                </div>
                             </div>
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -543,6 +590,8 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
     
     <script>
         // Profil fotoğrafı önizleme
@@ -564,6 +613,43 @@
             }
         });
 
+        // Profil formunu gönderme
+        document.getElementById('profile_form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Başarı mesajı göster
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı!',
+                        text: 'Profiliniz başarıyla güncellendi.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        position: 'top-end',
+                        toast: true
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                    });
+                }
+            });
+        });
+
         // Mesajları otomatik kapat
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
@@ -576,220 +662,5 @@
         });
     </script>
     
-    <script>
-        // Değerlendirme silme işlemi
-        document.querySelectorAll('.delete-review').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (confirm('Bu değerlendirmeyi silmek istediğinizden emin misiniz?')) {
-                    const reviewId = this.dataset.reviewId;
-                    fetch(`/review/${reviewId}/delete/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                        }
-                    });
-                }
-            });
-        });
-
-        // Değerlendirme düzenleme işlemi
-        document.querySelectorAll('.edit-review').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const reviewId = this.dataset.reviewId;
-                const reviewItem = this.closest('.review-item');
-                const currentRating = reviewItem.querySelector('.review-rating').querySelectorAll('.fas.fa-star').length;
-                const currentComment = reviewItem.querySelector('.review-comment').textContent;
-
-                // Düzenleme formunu oluştur
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/review/' + reviewId + '/edit/';
-                
-                // Form içeriğini oluştur
-                const ratingStars = [];
-                for (let i = 1; i <= 5; i++) {
-                    const checked = i <= currentRating ? ' checked' : '';
-                    ratingStars.push(`<input type="radio" name="rating" value="${i}" id="edit_star${i}_${reviewId}"${checked}>`);
-                    ratingStars.push(`<label for="edit_star${i}_${reviewId}"><i class="far fa-star"></i></label>`);
-                }
-
-                form.innerHTML = `
-                    <div class="mb-3">
-                        <label class="form-label">Puan</label>
-                        <div class="rating-stars">
-                            ${ratingStars.join('')}
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Yorum</label>
-                        <textarea name="comment" class="form-control" required>${currentComment}</textarea>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i>Kaydet
-                        </button>
-                        <button type="button" class="btn btn-secondary cancel-edit">
-                            <i class="fas fa-times me-1"></i>İptal
-                        </button>
-                    </div>`;
-
-                // Mevcut içeriği gizle ve formu ekle
-                const content = reviewItem.querySelector('.review-header').nextElementSibling;
-                content.style.display = 'none';
-                content.insertAdjacentElement('afterend', form);
-
-                // İptal butonuna tıklandığında
-                form.querySelector('.cancel-edit').addEventListener('click', () => {
-                    form.remove();
-                    content.style.display = 'block';
-                });
-
-                // Form gönderildiğinde
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const formData = new FormData(this);
-
-                    fetch(this.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            existingContent.textContent = formData.get('comment');
-                            form.remove();
-                            existingContent.style.display = 'block';
-                        } else {
-                            throw new Error('Network response was not ok');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                    });
-                });
-            });
-        });
-    </script>
-
-    {% block extra_js %}
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Yanıt silme işlemi
-        document.querySelectorAll('.delete-response-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (confirm('Bu yanıtı silmek istediğinizden emin misiniz?')) {
-                    const responseId = this.dataset.responseId;
-                    fetch(`/response/${responseId}/delete/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            const responseItem = this.closest('.response-item');
-                            if (responseItem) {
-                                responseItem.remove();
-                            } else {
-                                window.location.reload();
-                            }
-                        } else {
-                            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                        }
-                    });
-                }
-            });
-        });
-
-        // Yanıt düzenleme işlemi
-        document.querySelectorAll('.edit-response-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const responseId = this.dataset.responseId;
-                const responseText = this.dataset.responseText;
-                const responseItem = this.closest('.response-item');
-                const existingContent = responseItem.querySelector('.response-text');
-                
-                // Eğer düzenleme formu zaten açıksa, işlemi iptal et
-                if (responseItem.querySelector('form')) {
-                    return;
-                }
-
-                // Düzenleme formunu oluştur
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/response/${responseId}/edit/`;
-                form.classList.add('edit-response-form');
-                form.innerHTML = `
-                    <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
-                    <div class="mb-3">
-                        <textarea name="response_text" class="form-control" required>${responseText}</textarea>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <i class="fas fa-save me-1"></i>Kaydet
-                        </button>
-                        <button type="button" class="btn btn-sm btn-secondary cancel-edit">
-                            <i class="fas fa-times me-1"></i>İptal
-                        </button>
-                    </div>`;
-
-                // Mevcut içeriği gizle ve formu ekle
-                if (existingContent) {
-                    existingContent.style.display = 'none';
-                    existingContent.insertAdjacentElement('afterend', form);
-
-                    // İptal butonuna tıklandığında
-                    form.querySelector('.cancel-edit').addEventListener('click', () => {
-                        form.remove();
-                        existingContent.style.display = 'block';
-                    });
-
-                    // Form gönderildiğinde
-                    form.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        const formData = new FormData(this);
-
-                        fetch(this.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => {
-                            if (response.ok) {
-                                existingContent.textContent = formData.get('response_text');
-                                form.remove();
-                                existingContent.style.display = 'block';
-                            } else {
-                                throw new Error('Network response was not ok');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                        });
-                    });
-                }
-            });
-        });
-    });
-    </script>
-    {% endblock %}
-</body>
-</html> 
+ 
+        

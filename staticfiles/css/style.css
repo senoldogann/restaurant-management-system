@@ -1,16 +1,20 @@
 /* Global Styles */
 :root {
-    --primary-color: #ff4e50;
-    --secondary-color: #2c3e50;
+    --primary-color: #F39600;
+    --secondary-color: #2C3E50;
+    --primary-color-rgb: 243, 150, 0;
+    --secondary-color-rgb: 44, 62, 80;
     --accent-color: #e67e22;
     --light-color: #f8f9fa;
     --dark-color: #343a40;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: var(--dark-color);
+    font-family: 'Poppins', sans-serif;
+    color: var(--secondary-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
@@ -46,7 +50,7 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: stretch;
-    padding: 0;
+    padding:0;
     margin: 0;
 }
 
@@ -170,11 +174,12 @@ body {
 /* Slider */
 .main-slider {
     height: 100vh;
-    margin-top: -76px;
+    padding-top: 76px;
+    margin-top: 0;
 }
 
 .slider-content {
-    height: 100vh;
+    height: calc(100vh - 76px);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -444,4 +449,801 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: darken(var(--primary-color), 10%);
-} 
+}
+
+/* Restaurant & Bar Pages */
+.hero-section {
+    position: relative;
+    min-height: 40vh !important;
+    display: flex;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    padding-top: 80px;
+    margin-top: 0;
+}
+
+.hero-section h1,
+.hero-section .h1,
+.hero-section .h2 {
+    font-weight: 700 !important;
+}
+
+/* Ana sayfa için özel hero section yüksekliği ve font boyutları */
+.home .hero-section,
+.restaurant-home:not(.menu-page):not(.menu-item-detail-page):not(.reservation-page) .hero-section,
+.bar-home:not(.drinks-page):not(.drink-detail-page):not(.events-page):not(.reservation-page) .hero-section {
+    min-height: 90vh !important;
+    padding-top: 120px;
+}
+
+.home .hero-section h1,
+.restaurant-home:not(.menu-page):not(.menu-item-detail-page):not(.reservation-page) .hero-section h1,
+.bar-home:not(.drinks-page):not(.drink-detail-page):not(.events-page):not(.reservation-page) .hero-section h1 {
+    font-size: 2.5rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.home .hero-section p,
+.restaurant-home:not(.menu-page):not(.menu-item-detail-page):not(.reservation-page) .hero-section p,
+.bar-home:not(.drinks-page):not(.drink-detail-page):not(.events-page):not(.reservation-page) .hero-section p {
+    font-size: 1.2rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.home .hero-section .btn,
+.restaurant-home:not(.menu-page):not(.menu-item-detail-page):not(.reservation-page) .hero-section .btn,
+.bar-home:not(.drinks-page):not(.drink-detail-page):not(.events-page):not(.reservation-page) .hero-section .btn {
+    font-size: 0.9rem !important;
+    padding: 0.6rem 1.5rem !important;
+}
+
+/* Diğer sayfalar için hero section yüksekliği ve font boyutları */
+.menu-page .hero-section,
+.drinks-page .hero-section,
+.events-page .hero-section,
+.category-page .hero-section,
+.detail-page .hero-section,
+.drink-detail-page .hero-section,
+.reservation-page .hero-section,
+.restaurant-home.reservation-page .hero-section,
+.restaurant-home.menu-page .hero-section,
+.restaurant-home.menu-item-detail-page .hero-section,
+.bar-home.reservation-page .hero-section,
+.bar-home.drinks-page .hero-section,
+.bar-home.drink-detail-page .hero-section,
+.bar-home.events-page .hero-section {
+    min-height: 40vh !important;
+    padding-top: 80px;
+}
+
+/* Alt sayfalar için hero section font boyutları */
+.menu-page .hero-section h1,
+.drinks-page .hero-section h1,
+.events-page .hero-section h1,
+.category-page .hero-section h1,
+.detail-page .hero-section h1,
+.drink-detail-page .hero-section h1,
+.reservation-page .hero-section h1,
+.restaurant-home.reservation-page .hero-section h1,
+.restaurant-home.menu-page .hero-section h1,
+.restaurant-home.menu-item-detail-page .hero-section h1,
+.bar-home.reservation-page .hero-section h1,
+.bar-home.drinks-page .hero-section h1,
+.bar-home.drink-detail-page .hero-section h1,
+.bar-home.events-page .hero-section h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.menu-page .hero-section p,
+.drinks-page .hero-section p,
+.events-page .hero-section p,
+.category-page .hero-section p,
+.detail-page .hero-section p,
+.drink-detail-page .hero-section p,
+.reservation-page .hero-section p,
+.restaurant-home.reservation-page .hero-section p,
+.restaurant-home.menu-page .hero-section p,
+.restaurant-home.menu-item-detail-page .hero-section p,
+.bar-home.reservation-page .hero-section p,
+.bar-home.drinks-page .hero-section p,
+.bar-home.drink-detail-page .hero-section p,
+.bar-home.events-page .hero-section p {
+    font-size: 1rem !important;
+    margin-bottom: 0 !important;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+    z-index: 1;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.restaurant-home .hero-section.custom-hero {
+    background-image: var(--hero-image);
+}
+
+.restaurant-home .hero-section.default-hero {
+    background-image: url('../images/restaurant-bg.jpg');
+}
+
+.bar-home .hero-section.custom-hero {
+    background-image: var(--hero-image);
+}
+
+.bar-home .hero-section.default-hero {
+    background-image: url('../images/bar-bg.jpg');
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.contact-info i {
+    color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 30vh;
+        padding-top: 60px;
+    }
+    
+    .home .hero-section,
+    .restaurant-home .hero-section,
+    .bar-home .hero-section {
+        min-height: 40vh;
+        padding-top: 80px;
+    }
+    
+    /* Diğer sayfalar için mobil hero section yüksekliği */
+    .menu-page .hero-section,
+    .drinks-page .hero-section,
+    .events-page .hero-section,
+    .category-page .hero-section,
+    .detail-page .hero-section,
+    .drink-detail-page .hero-section,
+    .reservation-page .hero-section,
+    .bar-home.drinks-page .hero-section,
+    .bar-home.drink-detail-page .hero-section {
+        min-height: 30vh !important;
+        padding-top: 60px;
+    }
+    
+    .hero-section .container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .card-img-top {
+        height: 150px;
+    }
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Menü detay sayfası için hero section ayarları */
+.restaurant-home.menu-item-detail-page .hero-section {
+    min-height: 40vh !important;
+}
+
+.restaurant-home.menu-item-detail-page .hero-section h1,
+.restaurant-home.menu-item-detail-page .hero-section .h2 {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.restaurant-home.menu-item-detail-page .hero-section p,
+.restaurant-home.menu-item-detail-page .hero-section .lead {
+    font-size: 1rem !important;
+    margin-bottom: 0 !important;
+}
+
+/* Hero section yüksekliği için özel düzenleme */
+.menu-item-detail-page .hero-section {
+    min-height: 40vh !important;
+}
+
+.restaurant-home.detail-page .hero-section {
+ 
+    min-height: 40vh !important;
+    padding-top: 80px !important;
+
+}
+
+.restaurant-home.detail-page .hero-section h1,
+.restaurant-home.detail-page .hero-section .h2 {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+
+}
+
+.restaurant-home.detail-page .hero-section p,
+.restaurant-home.detail-page .hero-section .lead {
+    font-size: 1rem !important;
+    margin-bottom: 0 !important;
+
+}
+
+
+
+/* Event hero section için özel stil */
+.hero-section.event-hero {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 40vh !important;
+}
+
+.hero-section.event-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+    z-index: 1;
+}
+
+.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 0.25rem;
+}
+
+.rating-stars input[type="radio"] {
+    display: none;
+}
+
+.rating-stars label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #ddd;
+    transition: color 0.2s ease-in-out;
+}
+
+.rating-stars label:hover,
+.rating-stars label:hover ~ label,
+.rating-stars input[type="radio"]:checked ~ label {
+    color: #ffd700;
+}
+
+.rating-stars label:hover i,
+.rating-stars label:hover ~ label i,
+.rating-stars input[type="radio"]:checked ~ label i {
+    content: "\f005";
+    font-weight: 900;
+}
+
+/* Review Form Styles */
+.review-form .form-control:focus {
+    box-shadow: none;
+    border-color: #80bdff;
+}
+
+.review-form button[type="submit"] {
+    min-width: 44px;
+}
+
+/* Değerlendirme Bölümü Stilleri */
+.reviews-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    height: 100%;
+}
+
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.reviews-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--secondary-color);
+}
+
+.reviews-summary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+    padding-right: 100px;
+}
+
+.reviews-summary .btn-review {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.total-reviews {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.average-rating {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.rating-stars {
+    margin: 1rem 0;
+}
+
+.rating-stars i {
+    color: #ffc107;
+    font-size: 1.2rem;
+    margin: 0 2px;
+}
+
+.rating-distribution {
+    margin-top: 1rem;
+}
+
+.rating-bar {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.rating-label {
+    min-width: 60px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.progress {
+    flex-grow: 1;
+    height: 8px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: var(--primary-color);
+    border-radius: 4px;
+}
+
+.rating-count {
+    min-width: 40px;
+    text-align: left;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.review-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.review-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reviewer-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.reviewer-avatar-placeholder {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reviewer-details h6 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.review-rating i {
+    color: #ffc107;
+    font-size: 0.9rem;
+}
+
+.review-content {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.no-reviews i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.btn-review {
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-review:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.response-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.response-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.response-actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.response-actions .btn:hover {
+    transform: translateY(-2px);
+}
+
+.edit-response-form {
+    margin-top: 1rem;
+}
+
+.edit-response-form .input-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.edit-response-form textarea {
+    border: none;
+    padding: 0.8rem;
+    resize: vertical;
+    min-height: 60px;
+}
+
+.edit-response-form .btn {
+    padding: 0 1rem;
+}
+
+.edit-response-form .btn:hover {
+    transform: translateY(-2px);
+}
+
+.edited-info {
+    font-style: italic;
+    color: #6c757d;
+}
+
+/* Profile Page Styles */
+.profile-page {
+    padding: 2rem 0;
+    min-height: 100vh;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-color), #E67E22);
+    padding: 2rem;
+    text-align: center;
+    color: white;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    position: relative;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.default-avatar {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.profile-email {
+    opacity: 0.9;
+    margin: 0;
+}
+
+.profile-body {
+    padding: 2rem;
+}
+
+.profile-form .form-control {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.reviews-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+}
+
+.reviews-title {
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.review-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.review-info h5 {
+    margin: 0;
+    color: var(--secondary-color);
+}
+
+.review-rating {
+    color: #ffc107;
+}
+
+.review-comment {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.review-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.no-reviews i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-reviews p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .profile-card {
+        margin-bottom: 2rem;
+    }
+
+    .navigation-buttons {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+/* Profil Sayfası Stilleri */
+.order-history-section {
+    margin-top: 2rem;
+}
+
+.order-history-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.order-history-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+.order-history-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.order-table th {
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.order-table .btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.order-badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+}
+
+.order-modal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.order-modal .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.order-detail-table {
+    margin-bottom: 0;
+}
+
+.order-detail-table th {
+    background-color: #f8f9fa;
+}
+
+.order-total-section {
+    border-top: 2px solid #dee2e6;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.no-orders-message {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.no-orders-message i {
+    font-size: 3rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.no-orders-message p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .order-history-card {
+        margin-bottom: 1rem;
+    }
+    
+    .order-table {
+        font-size: 0.9rem;
+    }
+    
+    .btn-group .btn {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+    }
+}

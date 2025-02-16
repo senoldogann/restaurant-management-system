@@ -61,8 +61,8 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
     form = MenuItemAdminForm
-    list_display = ('name', 'category', 'price', 'is_available', 'is_featured', 'average_rating')
-    list_filter = ('category', 'is_available', 'is_featured', 'price_range')
+    list_display = ('name', 'get_price_display', 'category', 'is_available', 'is_featured')
+    list_filter = ('category', 'is_available', 'is_featured')
     search_fields = ('name', 'description')
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ('average_rating',)
@@ -81,6 +81,10 @@ class MenuItemAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
+
+    def get_price_display(self, obj):
+        return f"{obj.price}€"
+    get_price_display.short_description = 'Fiyat'
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):

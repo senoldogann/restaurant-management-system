@@ -99,13 +99,13 @@ class Drink(models.Model):
 
     name = models.CharField(max_length=100, verbose_name='İçecek Adı')
     slug = models.SlugField(unique=True, blank=True)
-    description = RichTextField(verbose_name='Açıklama')
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Fiyat')
+    description = RichTextField(verbose_name='İçecek Açıklaması')
+    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Fiyat (€)')
     price_range = models.CharField(max_length=10, choices=PRICE_RANGES, default='medium', verbose_name='Fiyat Aralığı')
     alcohol_content = models.CharField(max_length=10, choices=ALCOHOL_CONTENT, default='none', verbose_name='Alkol Oranı')
-    image = models.ImageField(upload_to='bar/drinks/', verbose_name='İçecek Görseli')
-    category = models.ForeignKey('DrinkCategory', on_delete=models.CASCADE, related_name='drinks', verbose_name='Kategori')
-    is_available = models.BooleanField(default=True, verbose_name='Mevcut mu?')
+    image = models.ImageField(upload_to='drinks/', verbose_name='İçecek Görseli')
+    category = models.ForeignKey(DrinkCategory, on_delete=models.CASCADE, related_name='drinks', verbose_name='Kategori')
+    is_available = models.BooleanField(default=True, verbose_name='Stokta Var mı?')
     is_featured = models.BooleanField(default=False, verbose_name='Öne Çıkan')
     ingredients = models.TextField(blank=True, verbose_name='İçindekiler')
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0, verbose_name='Ortalama Puan')
@@ -123,7 +123,7 @@ class Drink(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} - {self.category.name}"
+        return f"{self.name} - {self.price}€"
 
 class Event(models.Model):
     title = models.CharField(max_length=200, verbose_name='Etkinlik Başlığı')

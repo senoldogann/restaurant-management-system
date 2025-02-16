@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import HomePageSettings, UserProfile, Review, ReviewResponse, ContactMessage
+from .models import HomePageSettings, UserProfile, ContactMessage, Payment, Campaign, Order, OrderItem, Cart, CartItem
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -34,31 +34,6 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'date_joined')
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined')
     search_fields = ('username', 'first_name', 'last_name', 'email')
-
-class ReviewResponseInline(admin.TabularInline):
-    model = ReviewResponse
-    extra = 0
-    readonly_fields = ('created_at',)
-
-@admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('item_name', 'location', 'user', 'rating', 'created_at', 'is_approved')
-    list_filter = ('location', 'rating', 'is_approved', 'created_at')
-    search_fields = ('item_name', 'user__username', 'comment')
-    readonly_fields = ('created_at',)
-    inlines = [ReviewResponseInline]
-    actions = ['approve_reviews']
-
-    def approve_reviews(self, request, queryset):
-        queryset.update(is_approved=True)
-    approve_reviews.short_description = "Seçili değerlendirmeleri onayla"
-
-@admin.register(ReviewResponse)
-class ReviewResponseAdmin(admin.ModelAdmin):
-    list_display = ('review', 'responded_by', 'created_at')
-    list_filter = ('created_at', 'responded_by')
-    search_fields = ('review__item_name', 'response_text', 'responded_by__username')
-    readonly_fields = ('created_at',)
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
@@ -115,6 +90,32 @@ class ContactMessageAdmin(admin.ModelAdmin):
                 self.message_user(request, "Yanıt başarıyla gönderildi.", level='SUCCESS')
         
         super().save_model(request, obj, form, change)
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'amount', 'currency', 'status', 'stripe_payment_intent_id', 'created_at')
+    list_filter = ('status', 'currency', 'created_at')
+    search_fields = ('user__username', 'user__email', 'stripe_payment_intent_id')
+    readonly_fields = ('stripe_payment_intent_id', 'created_at', 'updated_at')
+    ordering = ('-created_at',)
+
+@admin.register(Campaign)
+class CampaignAdmin(admin.ModelAdmin):
+    list_display = ('title', 'discount_percentage', 'start_date', 'end_date', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'description')
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('order_number', 'user', 'status', 'total_amount', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('order_number', 'user__username', 'user__email')
+    readonly_fields = ('order_number', 'total_amount', 'created_at')
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ('menu_item', 'drink', 'quantity', 'price', 'total_price')
 
 # Varsayılan User admin'i özelleştirilmiş versiyonla değiştir
 admin.site.unregister(User)

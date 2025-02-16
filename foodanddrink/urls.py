@@ -19,28 +19,34 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
-from .views import home, register, profile, CustomLoginView, contact
-from django.contrib.auth.views import LogoutView
-from .forms import CustomAuthenticationForm
+from .views import home, register, profile_view, CustomLoginView, contact
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
     path('register/', register, name='register'),
-    path('login/', CustomLoginView.as_view(
-        template_name='registration/login.html',
-        authentication_form=CustomAuthenticationForm
-    ), name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('profile/', profile, name='profile'),
+    path('login/', CustomLoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+    path('profile/', profile_view, name='profile'),
     path('restaurant/', include('restaurant.urls')),
     path('bar/', include('bar.urls')),
     path('contact/', contact, name='contact'),
-    path('review/<int:item_id>/', views.add_review, name='add_review'),
-    path('review/', views.add_review, name='add_review'),
-    path('review/<int:review_id>/response/', views.add_response, name='add_response'),
-    path('response/<int:response_id>/edit/', views.edit_response, name='edit_response'),
-    path('response/<int:response_id>/delete/', views.delete_response, name='delete_response'),
-    path('review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
-    path('review/<int:review_id>/edit/', views.edit_review, name='edit_review'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('cart/', views.cart_view, name='cart'),
+    path('add-to-cart/', views.add_to_cart, name='add_to_cart'),
+    path('remove-from-cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('update-cart-item/<int:item_id>/', views.update_cart_item, name='update_cart_item'),
+    path('payment/', views.payment_page, name='payment'),
+    path('payment/success/', views.payment_success, name='payment_success'),
+    path('create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
+    path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
+    path('invoice/<str:order_number>/', views.invoice_view, name='invoice'),
+]
+
+# Debug modunda static ve media dosyalarını sun
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # Production modunda da media dosyalarını sun
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

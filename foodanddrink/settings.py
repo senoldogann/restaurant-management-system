@@ -29,7 +29,28 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+# NGROK URL'ini al
+NGROK_URL = os.getenv('NGROK_URL')
+
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    NGROK_URL,
+    '.ngrok-free.app',
+]
+
+# CSRF ayarları
+CSRF_TRUSTED_ORIGINS = [
+    f'https://{NGROK_URL}',
+    f'http://{NGROK_URL}',
+    'https://*.ngrok-free.app',
+    'http://*.ngrok-free.app',
+]
+
+# Güvenlik ayarları
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+SECURE_SSL_REDIRECT = False
 
 
 # Application definition
@@ -55,6 +76,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,6 +98,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'foodanddrink.context_processors.cart_processor',
             ],
         },
     },
@@ -129,9 +152,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -185,3 +210,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Tarayıcı kapandığında oturumu so
 # Oturum zaman aşımı ayarları
 SESSION_SAVE_EVERY_REQUEST = True  # Her istekte session'ı güncelle
 SESSION_IDLE_TIMEOUT = SESSION_COOKIE_AGE  # 2 saat boyunca işlem yapılmazsa session'ı sonlandır
+
+# Stripe Ayarları
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
+STRIPE_ACCOUNT_ID = os.getenv('STRIPE_ACCOUNT_ID')
+
+# Ödeme tutarları (kuruş cinsinden)
+RESERVATION_DEPOSIT_AMOUNT = 5000  # 50 TL
+
+# Whitenoise yapılandırması
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'

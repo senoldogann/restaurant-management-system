@@ -152,19 +152,7 @@
                                         <span class="category">
                                             <i class="fas fa-glass-martini-alt me-1"></i>{{ drink.category.name }}
                                         </span>
-                                        <span class="price">{{ drink.price }} ₺</span>
-                                    </div>
-                                    <div class="rating-section">
-                                        <div class="rating-stars">
-                                            {% for i in "12345"|make_list %}
-                                                {% if forloop.counter <= drink.average_rating %}
-                                                    <i class="fas fa-star text-warning"></i>
-                                                {% else %}
-                                                    <i class="far fa-star text-warning"></i>
-                                                {% endif %}
-                                            {% endfor %}
-                                            <span class="rating-text">({{ drink.average_rating|floatformat:1 }})</span>
-                                        </div>
+                                        <span class="price">{{ drink.price }} €</span>
                                     </div>
                                 </div>
                             </div>

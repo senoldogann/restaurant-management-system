@@ -3,9 +3,9 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q
 from .models import BarInfo, DrinkCategory, Drink, Event, Reservation, BarGallery
-from foodanddrink.models import Review
-from .forms import ReservationForm, ReviewForm
-from django.http import Http404
+from foodanddrink.models import Cart, CartItem
+from .forms import ReservationForm, EventReservationForm
+from django.http import Http404, JsonResponse
 from django.contrib.auth.decorators import login_required
 
 def home(request):
@@ -74,13 +74,20 @@ def category_detail(request, category_slug):
     }
     return render(request, 'bar/category_detail.html', context)
 
-def drink_detail(request, slug):
-    drink = get_object_or_404(Drink, slug=slug)
-    reviews = Review.objects.filter(item_name=drink.name, location='bar').order_by('-created_at')
+def drink_detail(request, drink_slug):
+    bar_info = BarInfo.objects.first()
+    drink = get_object_or_404(Drink, slug=drink_slug, is_available=True)
+    
+    # Hero image için CSS değişkeni
+    if bar_info and bar_info.hero_image:
+        hero_image_style = f'<style>:root {{ --hero-image: url("{bar_info.hero_image.url}"); }}</style>'
+    else:
+        hero_image_style = ''
     
     context = {
+        'bar_info': bar_info,
         'drink': drink,
-        'reviews': reviews,
+        'hero_image_style': hero_image_style,
     }
     return render(request, 'bar/drink_detail.html', context)
 
@@ -235,63 +242,6 @@ def search(request):
         'hero_image_style': hero_image_style,
     }
     return render(request, 'bar/search.html', context)
-
-@login_required
-def review(request):
-    bar_info = BarInfo.objects.first()
-    initial_drink = request.GET.get('drink')
-    
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            drink = form.cleaned_data['drink']
-            rating = form.cleaned_data['rating']
-            comment = form.cleaned_data['comment']
-            
-            # Kullanıcının daha önce yaptığı değerlendirmeyi kontrol et
-            existing_review = Review.objects.filter(user=request.user, item_name=drink.name, location='bar').first()
-            
-            if existing_review:
-                # Mevcut değerlendirmeyi güncelle
-                existing_review.rating = rating
-                existing_review.comment = comment
-                existing_review.save()
-                messages.success(request, 'Değerlendirmeniz başarıyla güncellendi.')
-            else:
-                # Yeni değerlendirme oluştur
-                Review.objects.create(
-                    user=request.user,
-                    item_name=drink.name,
-                    location='bar',
-                    rating=rating,
-                    comment=comment
-                )
-                messages.success(request, 'Değerlendirmeniz başarıyla kaydedildi.')
-            
-            return redirect('bar:drink_detail', slug=drink.slug)
-    else:
-        initial = {}
-        if initial_drink:
-            try:
-                drink = get_object_or_404(Drink, id=initial_drink)
-                initial['drink'] = drink
-            except Http404:
-                messages.error(request, 'Seçilen içecek bulunamadı.')
-        form = ReviewForm(initial=initial)
-    
-    # Hero image için CSS değişkeni
-    if bar_info and bar_info.hero_image:
-        hero_image_style = f'<style>:root {{ --hero-image: url("{bar_info.hero_image.url}"); }}</style>'
-    else:
-        hero_image_style = ''
-    
-    context = {
-        'form': form,
-        'bar_info': bar_info,
-        'hero_image_style': hero_image_style,
-    }
-    
-    return render(request, 'bar/add_review.html', context)
 
 def contact(request):
     bar_info = BarInfo.objects.first()

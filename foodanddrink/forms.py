@@ -1,67 +1,23 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile, Review
+from .models import UserProfile
 from restaurant.models import MenuItem
 from bar.models import Drink
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['profile_picture', 'bio', 'phone_number']
 
-class ReviewForm(forms.Form):
-    menu_item = forms.ModelChoiceField(
-        queryset=MenuItem.objects.filter(is_available=True).order_by('name'),
-        empty_label="Menü öğesi seçin...",
-        required=False,
-        widget=forms.Select(attrs={
-            'class': 'form-select',
-            'required': True,
-        })
-    )
-    
-    drink = forms.ModelChoiceField(
-        queryset=Drink.objects.filter(is_available=True).order_by('name'),
-        empty_label="İçecek seçin...",
-        required=False,
-        widget=forms.Select(attrs={
-            'class': 'form-select',
-            'required': True,
-        })
-    )
-    
-    rating = forms.IntegerField(
-        min_value=1,
-        max_value=5,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'required': True,
-            'placeholder': '1-5 arası bir puan verin'
-        })
-    )
-    
-    comment = forms.CharField(
-        widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'rows': 4,
-            'required': True,
-            'placeholder': 'Deneyiminizi paylaşın...'
-        })
-    )
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(required=True)
+    last_name = forms.CharField(required=True)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        menu_item = cleaned_data.get('menu_item')
-        drink = cleaned_data.get('drink')
-        
-        if not menu_item and not drink:
-            raise forms.ValidationError('Lütfen bir menü öğesi veya içecek seçin.')
-        
-        if menu_item and drink:
-            raise forms.ValidationError('Lütfen sadece bir menü öğesi veya içecek seçin.')
-        
-        return cleaned_data 
+    class Meta:
+        model = User
+        fields = UserCreationForm.Meta.fields + ('email', 'first_name', 'last_name')
 
 class CustomAuthenticationForm(AuthenticationForm):
     remember_me = forms.BooleanField(required=False, initial=False)
@@ -78,4 +34,10 @@ class CustomAuthenticationForm(AuthenticationForm):
         })
         self.fields['remember_me'].widget.attrs.update({
             'class': 'form-check-input'
-        }) 
+        })
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    subject = forms.CharField(max_length=200)
+    message = forms.CharField(widget=forms.Textarea) 

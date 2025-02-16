@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q
 from .models import RestaurantInfo, Category, MenuItem, Reservation, RestaurantGallery
-from foodanddrink.models import Review
+from foodanddrink.models import Cart, CartItem
 from .forms import ReservationForm
 from django.contrib.auth.decorators import login_required
 
@@ -69,7 +69,6 @@ def category_detail(request, category_slug):
 def menu_item_detail(request, slug):
     restaurant_info = RestaurantInfo.objects.first()
     item = get_object_or_404(MenuItem, slug=slug)
-    reviews = Review.objects.filter(item_name=item.name, location='restaurant').order_by('-created_at')
     
     # Hero image için CSS değişkeni
     if restaurant_info and restaurant_info.hero_image:
@@ -80,7 +79,6 @@ def menu_item_detail(request, slug):
     context = {
         'restaurant_info': restaurant_info,
         'item': item,
-        'reviews': reviews,
         'hero_image_style': hero_image_style,
     }
     return render(request, 'restaurant/menu_item_detail.html', context)
@@ -162,33 +160,3 @@ def search(request):
         'hero_image_style': hero_image_style,
     }
     return render(request, 'restaurant/search.html', context)
-
-@login_required
-def review(request):
-    if request.method == 'POST':
-        menu_item_id = request.POST.get('menu_item_id')
-        rating = request.POST.get('rating')
-        comment = request.POST.get('comment')
-        
-        menu_item = get_object_or_404(MenuItem, id=menu_item_id)
-        
-        # Kullanıcının daha önce yaptığı değerlendirmeyi kontrol et
-        existing_review = Review.objects.filter(user=request.user, menu_item=menu_item).first()
-        
-        if existing_review:
-            # Mevcut değerlendirmeyi güncelle
-            existing_review.rating = rating
-            existing_review.comment = comment
-            existing_review.save()
-        else:
-            # Yeni değerlendirme oluştur
-            Review.objects.create(
-                user=request.user,
-                menu_item=menu_item,
-                rating=rating,
-                comment=comment
-            )
-        
-        return redirect('restaurant:menu_item_detail', slug=menu_item.slug)
-    
-    return render(request, 'restaurant/review.html')

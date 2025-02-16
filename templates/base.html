@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -735,7 +736,7 @@
     {% block auth_content %}
     <!-- Navbar -->
     {% if request.path != "/" and 'login' not in request.path and 'register' not in request.path %}
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
                 <i class="fas fa-utensils me-2"></i>Food & Drink
@@ -783,6 +784,16 @@
                 </ul>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a href="{% url 'cart' %}" class="nav-link position-relative">
+                                <i class="fas fa-shopping-cart"></i>
+                                {% if request.user.is_authenticated %}
+                                    <span class="cart-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" {% if not cart or not cart.get_total_items %}style="display: none;"{% endif %}>
+                                        {{ cart.get_total_items|default:"0" }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                 {% if user.userprofile.profile_picture %}
@@ -801,7 +812,6 @@
                                         <i class="fas fa-cog"></i> Yönetim Paneli
                                     </a>
                                 {% endif %}
-                         
                                 <form method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}
                                     <button type="submit" class="dropdown-item">
@@ -936,6 +946,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
     <script>
         // Mesajların otomatik kaybolması
         document.addEventListener('DOMContentLoaded', function() {
@@ -966,7 +977,6 @@
                 var dropdownToggle = dropdown.querySelector('.dropdown-toggle');
                 var timeoutId;
 
-                // Mouse enter olayı
                 dropdown.addEventListener('mouseenter', function() {
                     clearTimeout(timeoutId);
                     dropdowns.forEach(function(otherDropdown) {
@@ -977,14 +987,12 @@
                     dropdownMenu.classList.add('show');
                 });
 
-                // Mouse leave olayı
                 dropdown.addEventListener('mouseleave', function() {
                     timeoutId = setTimeout(function() {
                         dropdownMenu.classList.remove('show');
                     }, 200);
                 });
 
-                // Tıklama olayı
                 dropdownToggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -996,7 +1004,6 @@
                     dropdownMenu.classList.toggle('show');
                 });
 
-                // Dropdown menü içindeki linkler için tıklama olayı
                 dropdownMenu.querySelectorAll('.dropdown-item').forEach(function(item) {
                     item.addEventListener('click', function(e) {
                         if (this.getAttribute('href')) {
@@ -1006,7 +1013,6 @@
                 });
             });
 
-            // Sayfa dışına tıklandığında tüm menüleri kapat
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.dropdown')) {
                     document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
@@ -1033,6 +1039,82 @@
             ],
             loop: true,
             protect: true
+        });
+
+        // Sepet Sayacı JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // CSRF token'ı al
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Sepet sayacını güncelleme fonksiyonu
+            window.updateCartCount = function(total) {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = total;
+                    cartCount.style.display = total > 0 ? 'inline-block' : 'none';
+                }
+            };
+
+            // Sepete ürün ekleme fonksiyonu
+            window.addToCart = function(menuItemId, quantity = 1) {
+                const formData = new FormData();
+                formData.append('menu_item_id', menuItemId);
+                formData.append('quantity', quantity);
+
+                fetch('/add-to-cart/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Sepet sayacını güncelle
+                        updateCartCount(data.cart_total);
+                        
+                        // Başarılı mesajı göster
+                        Swal.fire({
+                            title: 'Başarılı!',
+                            text: data.message,
+                            icon: 'success',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: data.message || 'Bir hata oluştu',
+                                icon: 'error',
+                                toast: true,
+                                position: 'top-end',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    Swal.fire({
+                        title: 'Hata!',
+                        text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                        icon: 'error',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                });
+            };
         });
     </script>
     {% block extra_js %}{% endblock %}

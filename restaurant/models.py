@@ -98,17 +98,17 @@ class MenuItem(models.Model):
         ('vegetarian', 'Vejetaryen'),
     ]
 
-    name = models.CharField(max_length=100, verbose_name='Yemek Adı')
+    name = models.CharField(max_length=100, verbose_name='Ürün Adı')
     slug = models.SlugField(unique=True, blank=True)
-    description = RichTextField(verbose_name='Açıklama')
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Fiyat')
+    description = RichTextField(verbose_name='Ürün Açıklaması')
+    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Fiyat (€)')
     price_range = models.CharField(max_length=10, choices=PRICE_RANGES, default='medium', verbose_name='Fiyat Aralığı')
-    image = models.ImageField(upload_to='restaurant/menu_items/', verbose_name='Ürün Görseli')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='menu_items', verbose_name='Kategori')
-    is_available = models.BooleanField(default=True, verbose_name='Mevcut mu?')
+    image = models.ImageField(upload_to='menu_items/', verbose_name='Ürün Görseli')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Kategori')
+    is_available = models.BooleanField(default=True, verbose_name='Stokta Var mı?')
     is_featured = models.BooleanField(default=False, verbose_name='Öne Çıkan')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Oluşturulma Tarihi')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Güncellenme Tarihi')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0, verbose_name='Ortalama Puan')
     allergens = models.JSONField(default=list, blank=True, null=True, verbose_name='Alerjenler')
     calories = models.PositiveIntegerField(null=True, blank=True, verbose_name='Kalori')
@@ -117,8 +117,8 @@ class MenuItem(models.Model):
     dietary_restrictions = models.JSONField(default=list, blank=True, verbose_name='Diyet Gereksinimleri')
 
     class Meta:
-        verbose_name = 'Menü Ürünü'
-        verbose_name_plural = 'Menü Ürünleri'
+        verbose_name = 'Menü Öğesi'
+        verbose_name_plural = 'Menü Öğeleri'
         ordering = ['category', 'name']
     
     def save(self, *args, **kwargs):
@@ -127,7 +127,7 @@ class MenuItem(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.name} - {self.category.name}"
+        return f"{self.name} - {self.price}€"
 
 class Reservation(models.Model):
     name = models.CharField(max_length=100, verbose_name='Ad Soyad')

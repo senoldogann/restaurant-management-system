@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), var(--primary-color); height: 40vh; display: flex; align-items: center; justify-content: center; margin-bottom: 3rem;">
+    <div class="container text-center text-white">
+        <h1 class="display-4 mb-3">Sepetim</h1>
+        <p class="lead">Siparişlerinizi gözden geçirin ve ödemeye geçin</p>
+    </div>
+</section>
+
+<style>
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 120px;
+        margin: 0 auto;
+    }
+
+    .quantity-control .btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        border-radius: 6px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #495057;
+    }
+
+    .quantity-control .btn:hover {
+        background-color: #e9ecef;
+    }
+
+    .quantity-control .form-control {
+        width: 50px;
+        height: 32px;
+        text-align: center;
+        margin: 0 8px;
+        padding: 0;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .quantity-control .form-control:focus {
+        box-shadow: none;
+        border-color: var(--primary-color);
+    }
+
+    /* Input number ok butonlarını gizle */
+    .quantity-control input[type="number"]::-webkit-inner-spin-button,
+    .quantity-control input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .quantity-control input[type="number"] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<div class="container py-5">
+    {% if cart.items.all %}
+        <div class="row">
+            <!-- Sepet Öğeleri -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Sepetinizdeki Ürünler</h4>
+                    </div>
+                    <div class="card-body">
+                        {% for item in cart.items.all %}
+                        <div class="cart-item mb-3 pb-3 border-bottom" id="cart-item-{{ item.id }}">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    {% if item.menu_item %}
+                                        <img src="{{ item.menu_item.image.url }}" alt="{{ item.menu_item.name }}" class="img-fluid rounded">
+                                    {% else %}
+                                        <img src="{{ item.drink.image.url }}" alt="{{ item.drink.name }}" class="img-fluid rounded">
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h5 class="mb-1">{{ item.get_item_name }}</h5>
+                                    <p class="text-muted mb-0">Birim Fiyat: {{ item.get_item_price }} €</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="quantity-control">
+                                        <button class="btn quantity-decrease" data-item-id="{{ item.id }}">-</button>
+                                        <input type="number" class="form-control quantity-input" value="{{ item.quantity }}" min="1" data-item-id="{{ item.id }}">
+                                        <button class="btn quantity-increase" data-item-id="{{ item.id }}">+</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <h5 class="mb-0 item-total" data-item-id="{{ item.id }}">{{ item.get_total_price }} €</h5>
+                                </div>
+                                <div class="col-md-1 text-end">
+                                    <button class="btn btn-link text-danger remove-item" data-item-id="{{ item.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sepet Özeti -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Sipariş Özeti</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Ara Toplam</span>
+                            <span class="cart-subtotal">{{ cart.get_total_price }} €</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>KDV (14%)</span>
+                            <span class="cart-tax">{{ cart.get_tax_amount }} €</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Toplam</strong>
+                            <strong class="cart-total">{{ cart.get_total_with_tax }} €</strong>
+                        </div>
+                        <a href="{% url 'payment' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-lock me-2"></i>Ödemeye Geç
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h3>Sepetiniz Boş</h3>
+            <p class="text-muted">Sepetinizde henüz ürün bulunmuyor.</p>
+            <div class="mt-4">
+                <a href="{% url 'restaurant:menu' %}" class="btn btn-primary">
+                    <i class="fas fa-utensils me-2"></i>Menüye Git
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Miktar artırma/azaltma butonları
+    document.querySelectorAll('.quantity-decrease, .quantity-increase').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.dataset.itemId;
+            const input = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
+            let quantity = parseInt(input.value);
+            
+            if (this.classList.contains('quantity-decrease')) {
+                quantity = Math.max(1, quantity - 1);
+            } else {
+                quantity += 1;
+            }
+            
+            input.value = quantity;
+            updateCartItem(itemId, quantity);
+        });
+    });
+
+    // Miktar input değişikliği
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const itemId = this.dataset.itemId;
+            let quantity = parseInt(this.value);
+            
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
+                this.value = 1;
+            }
+            
+            updateCartItem(itemId, quantity);
+        });
+    });
+
+    // Ürün silme
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+            if (confirm('Bu ürünü sepetten kaldırmak istediğinizden emin misiniz?')) {
+                const itemId = this.dataset.itemId;
+                removeFromCart(itemId);
+            }
+        });
+    });
+
+    // Sepet güncelleme fonksiyonu
+    function updateCartItem(itemId, quantity) {
+        fetch(`/update-cart-item/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `quantity=${quantity}`
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                // Sayfa yenilemeden UI'ı güncelle
+                const itemTotal = document.querySelector(`.item-total[data-item-id="${itemId}"]`);
+                const cartSubtotal = document.querySelector('.cart-subtotal');
+                const cartTax = document.querySelector('.cart-tax');
+                const cartTotal = document.querySelector('.cart-total');
+
+                if (itemTotal) itemTotal.textContent = `${data.item_total} €`;
+                if (cartSubtotal) cartSubtotal.textContent = `${data.cart_subtotal} €`;
+                if (cartTax) cartTax.textContent = `${data.cart_tax} €`;
+                if (cartTotal) cartTotal.textContent = `${data.cart_total} €`;
+            } else {
+                console.error('Güncelleme hatası:', data.error);
+                alert('Ürün güncellenirken bir hata oluştu: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+            alert('Ürün güncellenirken bir hata oluştu. Lütfen tekrar deneyin.');
+        });
+    }
+
+    // Ürün silme fonksiyonu
+    function removeFromCart(itemId) {
+        fetch(`/remove-from-cart/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const cartItem = document.querySelector(`#cart-item-${itemId}`);
+                cartItem.remove();
+                
+                // Sepet özetini güncelle
+                updateCartSummary();
+                
+                // Sepet boşsa sayfayı yenile
+                if (document.querySelectorAll('.cart-item').length === 0) {
+                    window.location.reload();
+                }
+            }
+        });
+    }
+
+    // Sepet özetini güncelleme fonksiyonu
+    function updateCartSummary() {
+        let subtotal = 0;
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const price = parseFloat(item.querySelector('.item-total').textContent.replace('€', '').trim());
+            subtotal += price;
+        });
+
+        const tax = subtotal * 0.14; // %14 KDV
+        const total = subtotal + tax;
+
+        document.querySelector('.cart-subtotal').textContent = `${subtotal.toFixed(2)} €`;
+        document.querySelector('.cart-tax').textContent = `${tax.toFixed(2)} €`;
+        document.querySelector('.cart-total').textContent = `${total.toFixed(2)} €`;
+    }
+});
+</script>
+{% endblock %} 
