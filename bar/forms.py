@@ -6,10 +6,11 @@ from crispy_forms.layout import Layout, Submit, Row, Column
 class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
-        fields = ['name', 'email', 'phone', 'date', 'time', 'guests', 'notes']
+        fields = ['name', 'email', 'phone', 'date', 'time', 'guests', 'event', 'notes']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'event': forms.Select(attrs={'class': 'form-control'}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -32,9 +33,13 @@ class ReservationForm(forms.ModelForm):
                 Column('time', css_class='form-group col-md-6'),
                 css_class='form-row'
             ),
+            'event',
             'notes',
             Submit('submit', 'Rezervasyon Yap', css_class='btn btn-primary btn-lg mt-4')
         )
+        # Sadece aktif etkinlikleri göster
+        self.fields['event'].queryset = Event.objects.filter(is_active=True)
+        self.fields['event'].required = False
 
 class EventReservationForm(forms.ModelForm):
     class Meta:

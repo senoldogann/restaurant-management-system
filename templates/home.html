@@ -9,7 +9,7 @@
         <div class="row g-0">
             <!-- Restaurant Seçeneği -->
             <div class="col-md-6 choice-item restaurant-choice">
-                <div class="choice-content" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% if home_settings.restaurant_background %}{{ home_settings.restaurant_background.url }}{% else %}{% static "images/restaurant-bg.jpg" %}{% endif %}'); background-size: cover; background-position: center; min-height: 100vh; display: flex; align-items: center;">
+                <div class="choice-content" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% if home_settings.restaurant_background %}{{ home_settings.restaurant_background.url }}{% else %}{% static "images/restaurant-bg.jpg" %}{% endif %}');">
                     <div class="choice-overlay"></div>
                     <div class="choice-text">
                         <h2 class="choice-title">Restaurant</h2>
@@ -37,7 +37,7 @@
 
             <!-- Bar Seçeneği -->
             <div class="col-md-6 choice-item bar-choice">
-                <div class="choice-content" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% if home_settings.bar_background %}{{ home_settings.bar_background.url }}{% else %}{% static "images/bar-bg.jpg" %}{% endif %}'); background-size: cover; background-position: center; min-height: 100vh; display: flex; align-items: center;">
+                <div class="choice-content" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% if home_settings.bar_background %}{{ home_settings.bar_background.url }}{% else %}{% static "images/bar-bg.jpg" %}{% endif %}');">
                     <div class="choice-overlay"></div>
                     <div class="choice-text">
                         <h2 class="choice-title">Bar</h2>
@@ -65,4 +65,172 @@
         </div>
     </div>
 </div>
+
+<style>
+    .choice-section {
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .choice-container {
+        height: 100vh;
+    }
+
+    .choice-item {
+        height: 100vh;
+        position: relative;
+    }
+
+    .choice-content {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .choice-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+
+    .choice-text {
+        position: relative;
+        z-index: 2;
+        color: white;
+        text-align: center;
+        max-width: 500px;
+        padding: 2rem;
+    }
+
+    .choice-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .choice-description {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .choice-features {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .feature {
+        text-align: center;
+    }
+
+    .feature i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .feature span {
+        font-size: 1rem;
+        display: block;
+    }
+
+    .choice-btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        border-width: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .choice-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 768px) {
+        .choice-container {
+            height: auto;
+        }
+
+        .choice-item {
+            height: 100vh;
+        }
+
+        .choice-text {
+            padding: 1rem;
+        }
+
+        .choice-title {
+            font-size: 2.5rem;
+        }
+
+        .choice-description {
+            font-size: 1rem;
+        }
+
+        .choice-features {
+            gap: 1rem;
+        }
+
+        .feature i {
+            font-size: 1.5rem;
+        }
+
+        .feature span {
+            font-size: 0.9rem;
+        }
+
+        .choice-btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .choice-title {
+            font-size: 2rem;
+        }
+
+        .choice-features {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .feature {
+            margin-bottom: 0;
+        }
+
+        .choice-text {
+            padding: 1rem;
+        }
+    }
+
+    @media (max-height: 600px) {
+        .choice-item {
+            height: auto;
+            min-height: 100vh;
+        }
+
+        .choice-text {
+            padding: 2rem 1rem;
+        }
+
+        .choice-features {
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
 {% endblock %}

@@ -4,10 +4,13 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), var(--primary-color); height: 40vh; display: flex; align-items: center; justify-content: center; margin-bottom: 3rem;">
-    <div class="container text-center text-white">
-        <h1 class="display-4 mb-3">Sepetim</h1>
-        <p class="lead">Siparişlerinizi gözden geçirin ve ödemeye geçin</p>
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="hero-title" data-aos="fade-up">Sepetim</h1>
+            <p class="hero-description" data-aos="fade-up" data-aos-delay="100">Siparişlerinizi gözden geçirin ve ödemeye geçin</p>
+        </div>
     </div>
 </section>
 
@@ -62,6 +65,23 @@
     }
     .quantity-control input[type="number"] {
         -moz-appearance: textfield;
+    }
+
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/static/images/cart-hero.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 40vh;
+        margin-bottom: 3rem;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
     }
 </style>
 

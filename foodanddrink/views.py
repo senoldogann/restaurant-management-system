@@ -375,8 +375,10 @@ def payment_success(request):
 @login_required
 def cart_view(request):
     cart = get_or_create_active_cart(request.user)
+    restaurant_info = RestaurantInfo.objects.first()
     context = {
-        'cart': cart
+        'cart': cart,
+        'restaurant_info': restaurant_info
     }
     return render(request, 'cart.html', context)
 
